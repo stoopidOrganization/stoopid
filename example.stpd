@@ -1,0 +1,9 @@
+#A test program that counts from 1 to 10
+var : uwu = 0
+math : uwu : uwu + 1
+out : uwu
+sleep : 0.1
+goif : 3 : uwu < 10#test uwu
+var : uwu = 1
+#out : UwU
+goto : 4 

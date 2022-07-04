@@ -1,0 +1,31 @@
+string: hello = hello world
+out:hello #=> "hello world"
+var: a = 5
+var: b = 2
+var: c = 0
+var: d = 0
+math: c : a + b
+
+arr: test : 5
+setarr: test : 1 : c
+getarr: test : 1 : d
+out: d #=> 7
+app: test : 5
+var: d = 4
+app: test : d
+var: e = 0
+var: f = 0
+getarr: test : 5 : e
+getarr: test : 6 : f
+out: e #=> 5
+out: f #=> 4
+math: e : e + f
+var: ex = 0
+goif:25:e>f
+out: 0
+out: 1
+out: hello : hi : label#hello world x2
+goif: 32: ex == 1
+var: ex = 1
+goto: hi
+
