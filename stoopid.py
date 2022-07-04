@@ -2,7 +2,7 @@ import time, sys
 operators=["+","-","*","/","%"]
 comparators=["<",">","<=",">=", "==","!="]
 #get the file name which is the first argument
-overwrite="test.stpd"
+overwrite=""
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
