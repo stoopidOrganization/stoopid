@@ -91,7 +91,7 @@ while i<len(program_lines):
         linepieces=lstrip.split(":")
 
         if linepieces[0]=="var": # var : name = value
-            vars[str(linepieces[1]).split("=")[0]]=float(str(linepieces[1]).split("=")[1])
+            vars[str(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
         if linepieces[0]=="arr": # arr : name : size
             arrs[str(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
         if linepieces[0]=="app": # app : name : value
