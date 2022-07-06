@@ -58,11 +58,9 @@ i=0
 #resolve all lables
 while i<len(program_lines):
     line=program_lines[i]
-    #print(line)
     if line[0].startswith=="#" or line=="\n":
         i+=1
         continue
-    #cut off the comments
     line=line.split("#")[0]
     if line.startswith("string"):
         lstrip=line.replace("\n","")
@@ -78,7 +76,7 @@ i=0
 while i<len(program_lines):
     try:
         line=program_lines[i]
-        #print(line)
+
         if line[0].startswith=="#" or line=="\n":
             i+=1
             continue
@@ -92,38 +90,36 @@ while i<len(program_lines):
 
         if linepieces[0]=="var": # var : name = value
             vars[str(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
+            
         if linepieces[0]=="arr": # arr : name : size
             arrs[str(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
+
         if linepieces[0]=="app": # app : name : value
             arrs[str(linepieces[1])].append(float(get_value(linepieces[2])))
+
         if linepieces[0]=="getarr": # getarr : name : index : destination
             vars[str(linepieces[3])]=arrs[str(linepieces[1])][get_value(linepieces[2])]
+
         if linepieces[0]=="setarr": # setarr : name : index : value
             arrs[str(linepieces[1])][get_value(linepieces[2])]=get_value(linepieces[3])
+
         if linepieces[0].strip()=="string": # string : name = value
             vars[str(linepieces[1]).split("=")[0].strip()]=str(linepieces[1]).split("=")[1]
+
         if linepieces[0]=="out": #out : name
-            #if the variable is a number, print it as a number
-            try:
-                if isnumber(vars[linepieces[1]]):
-                    if is_float(vars[linepieces[1]]):
-                        print(float(vars[linepieces[1]]))
-                    else:
-                        print(int(vars[linepieces[1]]))
-                else:
-                    print(str(vars[linepieces[1]]))
-            except Exception:
-                print(linepieces[1])
+                    print(get_value(linepieces[1]))
+ 
         if linepieces[0]=="goto": #goto : line
             if linepieces[1] in labels:
                 i=labels[linepieces[1]]
                 continue
             i=int(linepieces[1])-1
             continue
+
         if linepieces[0]=="sleep":#sleep : time
             time.sleep(float(linepieces[1]))
+            
         if linepieces[0]=="math":#math : destination : value1 operator value2
-
             vardest=str(linepieces[1])
             op=get_operator(linepieces[2])
             var1=get_value(linepieces[2].split(op)[0])
@@ -138,8 +134,8 @@ while i<len(program_lines):
                 vars[vardest]=var1/var2
             if op=="%":
                 vars[vardest]=var1%var2
-        if linepieces[0]=="goif": #goif : destination : var1  comparator  var2 
 
+        if linepieces[0]=="goif": #goif : destination : var1  comparator  var2 
             comp=get_comparator(linepieces[2])
             var1=get_value(str(linepieces[2]).split(comp)[0])
             var2=get_value(str(linepieces[2]).split(comp)[1])
@@ -173,5 +169,3 @@ while i<len(program_lines):
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         break
-
-#print("Finished")
