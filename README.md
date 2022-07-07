@@ -6,8 +6,7 @@ Usage:
 Additional parameters:
 
 --log <logfile> 
-
-    logs the output to a file
+   logs the output to a file
 
 
 
