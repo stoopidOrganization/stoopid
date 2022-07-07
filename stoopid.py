@@ -137,7 +137,7 @@ while i<len(program_lines):
         if iscom("out"): #out : name
             out=get_value(linepieces[1])
             print(out)
-            if logging==1:
+            if logging:
                 log.write(str(out)+"\n")
 
         if iscom("goto"): #goto : line
@@ -199,5 +199,5 @@ while i<len(program_lines):
         i+=1
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
-        print("interpreter crashed at line: "e.__traceback__.tb_lineno)
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         break
