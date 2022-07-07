@@ -199,4 +199,5 @@ while i<len(program_lines):
         i+=1
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
+        print("interpreter crashed at line: "e.__traceback__.tb_lineno)
         break
