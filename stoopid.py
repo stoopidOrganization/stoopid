@@ -17,7 +17,10 @@ def get_value(inp): #checks if the input is a number or a variable
         else:
             return int(inp)
     else:
-        return vars[inp]
+        if inp in vars:
+            return vars[inp]
+        else:
+            return inp
 
 def search_array(string, array):
     for i in range(len(array)):
