@@ -1,6 +1,16 @@
-The commands of stoopid (wip name) are:
+Usage: 
+(python version) python stoopid.py <inputfile>
+(exe) stoopid.exe <inputfile>
 
-var : name = value
+Additional parameters:
+--log <logfile> 
+    logs the output to a file
+
+
+
+The commands of stoopid are:
+
+var : name = value 
 
 arr : name : size
 
