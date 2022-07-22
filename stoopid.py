@@ -41,6 +41,12 @@ def get_comparator(line):
         if comparator in line:
             return comparator
 
+def get_nonum(num):
+    global i
+    if isnumber(num):
+        print(f"Error in line {i+1}: Cannot use numbers in this context")
+    return num
+
 def iscom(comm):
     global linepieces
     return comm==linepieces[0]
@@ -74,13 +80,24 @@ else:
 program=open(file_name,"r")
 program_lines=program.readlines()
 program.close()
-
+commands=["var","arr","app","getarr","setarr","string","out","goto","sleep","goif","math","end"]
 operators=["+","-","*","/","%"]
 comparators=["<",">","<=",">=", "==","!="]
 vars={}
 arrs={}
 labels={}
-
+i=0
+#validate every line
+for i in range(len(program_lines)):
+    lp=program_lines[i].replace(" ","").split(":")
+    if len(program_lines[i].replace(" ",""))>1:
+        if lp[0] in commands:
+            continue
+        elif lp[0].startswith("#"):
+            continue
+        else:
+            print(f"Error in line {i+1}: Command not found {lp[0]}")
+            exit()
 #resolve all lables
 i=0
 while i<len(program_lines):
@@ -96,7 +113,7 @@ while i<len(program_lines):
     linepieces=lstrip.split(":")
 
     if linepieces[-1]=="label":# :name:label at the end of the line
-        labels[linepieces[-2]]=i
+        labels[get_nonum(linepieces[-2])]=i
     i+=1
 i=0
 
@@ -116,13 +133,13 @@ while i<len(program_lines):
         linepieces=lstrip.split(":")
 
         if iscom("var"): # var : name = value
-            vars[str(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
+            vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
             
         if iscom("arr"): # arr : name : size
-            arrs[str(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
+            arrs[get_nonum(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
 
         if iscom("app"): # app : name : value
-            arrs[str(linepieces[1])].append(float(get_value(linepieces[2])))
+            arrs[get_nonum(linepieces[1])].append(float(get_value(linepieces[2])))
 
         if iscom("getarr"): # getarr : name : index : destination
             vars[str(linepieces[3])]=arrs[str(linepieces[1])][get_value(linepieces[2])]
@@ -195,8 +212,10 @@ while i<len(program_lines):
                 if var1!=var2:
                     i=destination-1
                     continue
-
+        if iscom("end"):
+            exit()
         i+=1
+
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
