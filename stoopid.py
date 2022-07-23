@@ -23,10 +23,11 @@ def get_value(inp): #checks if the input is a number or a variable
             return inp
 
 def search_array(string, array):
-    for i in range(len(array)):
-        if array[i] in string:
-            return array[i]
-    print(f"Error: String search failed. Element {string} not found in array: \n{array}")
+    for k in range(len(array)):
+        if array[k] in string:
+            return array[k]
+    global i
+    print(f"Error in line {i+1}: String search failed. Element {string} not found in array: \n{array}")
     exit()
 
 def isnumber(string):
@@ -188,30 +189,40 @@ while i<len(program_lines):
             comp=search_array(linepieces[2],comparators)
             var1=get_value(str(linepieces[2]).split(comp)[0])
             var2=get_value(str(linepieces[2]).split(comp)[1])
-            destination=get_value(linepieces[1])
+            if linepieces[1] in labels:
+                destination=labels[linepieces[1]]
+            else:
+                
+                destination=get_value(linepieces[1])
+                if not isnumber(destination):
+                    print(f"Error in line {i+1}: Destination is not a number")
+                    exit()
+                else:
+                    destination=int(destination)-1
+            
             if comp=="<<":
                 if var1<var2:
-                    i=destination-1
+                    i=destination
                     continue
             if comp==">>":
                 if var1>var2:
-                    i=destination-1
+                    i=destination
                     continue
             if comp=="<=":
                 if var1<=var2:
-                    i=destination-1
+                    i=destination
                     continue
             if comp==">=":
                 if var1>=var2:
-                    i=destination-1
+                    i=destination
                     continue
             if comp=="==":
                 if var1==var2:
-                    i=destination-1
+                    i=destination
                     continue
             if comp=="!=":
                 if var1!=var2:
-                    i=destination-1
+                    i=destination
                     continue
         if iscom("end"):
             exit()
