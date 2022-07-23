@@ -26,7 +26,8 @@ def search_array(string, array):
     for i in range(len(array)):
         if array[i] in string:
             return array[i]
-    return -1
+    print(f"Error: String search failed. Element {string} not found in array: \n{array}")
+    exit()
 
 def isnumber(string):
     try:
@@ -82,7 +83,7 @@ program_lines=program.readlines()
 program.close()
 commands=["var","arr","app","getarr","setarr","string","out","goto","sleep","goif","math","end"]
 operators=["+","-","*","/","%"]
-comparators=["<",">","<=",">=", "==","!="]
+comparators=["<<",">>","<=",">=", "==","!="]
 vars={}
 arrs={}
 labels={}
@@ -188,11 +189,11 @@ while i<len(program_lines):
             var1=get_value(str(linepieces[2]).split(comp)[0])
             var2=get_value(str(linepieces[2]).split(comp)[1])
             destination=get_value(linepieces[1])
-            if comp=="<":
+            if comp=="<<":
                 if var1<var2:
                     i=destination-1
                     continue
-            if comp==">":
+            if comp==">>":
                 if var1>var2:
                     i=destination-1
                     continue
