@@ -39,8 +39,18 @@ or a label (:name:label)
 
 wthe comparitors are
 
-"<",">","<=",">=", "==","!="
+<<, >>, ==, !=, <=, >=
 
 the operators are
 
-"+","-","*","/","%"
++ ,-, *, /, %
+
+I should note that the syntax is strict, and can only be written as in the example
+
+eg.: math: a : b+c*d #Invalid because of multiple operators
+
+   math operations have to be split up into their individual paths
+
+   math: a : c*d #the correct way
+   
+   math: a : a+b
