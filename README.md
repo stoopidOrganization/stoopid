@@ -32,6 +32,7 @@ math : destination : value1 operator value2
 
 goif : destination : var1  comparator  var2 
 
+import:name
 
 at the end of a line there can be a comment (#)
 
@@ -54,3 +55,6 @@ eg.: math: a : b+c*d #Invalid because of multiple operators
    math: a : c*d #the correct way
    
    math: a : a+b
+
+
+libraries will be executed on each line with the run() function.

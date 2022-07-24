@@ -238,9 +238,12 @@ while i<len(program_lines):
         
         if iscom("import"):
             #imports a stoopid library which is essentially a python library specifically for the language
-            a=__import__(str(linepieces[1]))
-            libs.append(a)
-
+            try:
+                a=__import__(str(linepieces[1]))
+                libs.append(a)
+            except:
+                print(f"Error in line {i+1}: Library not found {linepieces[1]}")
+                exit()
         if iscom("end"):
             exit()
         #check for any commands from the librarys
