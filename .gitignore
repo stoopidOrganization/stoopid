@@ -130,3 +130,7 @@ dmypy.json
 .vscode
 /.vscode
 test.stpd
+testlib.py
+libhelp.py
+tests/
+log.txt

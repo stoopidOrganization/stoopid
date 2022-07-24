@@ -1,5 +1,6 @@
 import time, sys
 
+libs=[]
 def is_float(number):
     try:
     #check if the number could be represented as an int
@@ -75,9 +76,14 @@ if "--log" in sys.argv:
         time.sleep(5)
         exit()
     log=open(log_file, "w")
-
 else:
     logging=0
+
+
+if "--validate" in sys.argv:
+    val=1
+else:
+    val=0
 
 program=open(file_name,"r")
 program_lines=program.readlines()
@@ -89,17 +95,18 @@ vars={}
 arrs={}
 labels={}
 i=0
-#validate every line
-for i in range(len(program_lines)):
-    lp=program_lines[i].replace(" ","").split(":")
-    if len(program_lines[i].replace(" ",""))>1:
-        if lp[0] in commands:
-            continue
-        elif lp[0].startswith("#"):
-            continue
-        else:
-            print(f"Error in line {i+1}: Command not found {lp[0]}")
-            exit()
+#validate every line (breaks external libraries)
+if val:
+    for i in range(len(program_lines)):
+        lp=program_lines[i].replace(" ","").split(":")
+        if len(program_lines[i].replace(" ",""))>1:
+            if lp[0] in commands:
+                continue
+            elif lp[0].startswith("#"):
+                continue
+            else:
+                print(f"Error in line {i+1}: Command not found {lp[0]}")
+                exit()
 #resolve all lables
 i=0
 while i<len(program_lines):
@@ -163,7 +170,11 @@ while i<len(program_lines):
             if linepieces[1] in labels:
                 i=labels[linepieces[1]]
                 continue
-            i=int(linepieces[1])-1
+            try:
+                i=int(linepieces[1])-1
+            except:
+                print(f"Error in line {i+1}: Label not found {linepieces[1]}")
+                exit()
             continue
 
         if iscom("sleep"):#sleep : time
@@ -224,8 +235,17 @@ while i<len(program_lines):
                 if var1!=var2:
                     i=destination
                     continue
+        
+        if iscom("import"):
+            #imports a stoopid library which is essentially a python library specifically for the language
+            a=__import__(str(linepieces[1]))
+            libs.append(a)
+
         if iscom("end"):
             exit()
+        #check for any commands from the librarys
+        for lib in libs:
+            lib.run(line)
         i+=1
 
     except Exception as e:
