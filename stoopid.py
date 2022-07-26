@@ -55,7 +55,7 @@ def iscom(comm):
     return comm==linepieces[0]
 
 
-overwrite=""#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
