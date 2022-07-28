@@ -95,6 +95,8 @@ arrs={}
 labels={}
 i=0
 interpreter = True
+brackets = 0
+
 #validate every line (breaks external libraries)
 if val:
     for i in range(len(program_lines)):
@@ -128,7 +130,7 @@ while i<len(program_lines):
 i=0
 
 def analyzeLine(line, linepieces):
-    global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators
+    global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets
 
     if iscom("var", linepieces): # var : name = value
         vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
@@ -245,17 +247,8 @@ def analyzeLine(line, linepieces):
 
         # print(str(comp) + " " + str(interpreter))
 
-        if comp == "<<" and not var1 < var2:
-            interpreter = False
-        elif comp == ">>" and not var1 > var2:
-            interpreter = False
-        elif comp == "<=" and not var1 <= var2:
-            interpreter = False
-        elif comp == ">=" and not var1 >= var2:
-            interpreter = False
-        elif comp == "==" and not var1 == var2:
-            interpreter = False
-        elif comp == "!=" and not var1 != var2:
+        if (comp == "<<" and not var1 < var2) or (comp == ">>" and not var1 > var2) or (comp == "<=" and not var1 <= var2) or (comp == ">=" and not var1 >= var2) or (comp == "==" and not var1 == var2) or (comp == "!=" and not var1 != var2):
+            brackets += 1
             interpreter = False
     
     elif iscom("end", linepieces):
@@ -273,26 +266,30 @@ def analyzeLine(line, linepieces):
 # main loop
 while i < len(program_lines):
     try:
-        if interpreter:
-            # get the line
-            line = program_lines[i]
+        # get the line
+        line = program_lines[i]
 
-            # cut off the comments
-            line = line.split("#")[0]
-            if line.startswith("string"):
-                lstrip=line.replace("\n","")
-            else:
-                lstrip = line.replace(" ","").replace("\n","")
-            
-            # make an array of the line pieces
-            linepieces = lstrip.split(":")
-            
+        # cut off the comments
+        line = line.split("#")[0]
+        if line.startswith("string"):
+            lstrip=line.replace("\n","")
+        else:
+            lstrip = line.replace(" ","").replace("\n","")
+        
+        # make an array of the line pieces
+        linepieces = lstrip.split(":")
+
+        if interpreter:
             analyzeLine(line, linepieces)
         else:
-            if program_lines[i].startswith("}"):
-                interpreter = True
+            if linepieces[0] == "}":
+                brackets -= 1
+                if brackets <= 0:
+                    interpreter = True
+            elif linepieces[0] == "if":
+                brackets += 1
             i += 1
-            
+        
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
