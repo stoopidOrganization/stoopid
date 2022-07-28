@@ -248,9 +248,15 @@ def analyzeLine(line, linepieces):
         # print(str(comp) + " " + str(interpreter))
 
         if (comp == "<<" and not var1 < var2) or (comp == ">>" and not var1 > var2) or (comp == "<=" and not var1 <= var2) or (comp == ">=" and not var1 >= var2) or (comp == "==" and not var1 == var2) or (comp == "!=" and not var1 != var2):
-            brackets += 1
-            interpreter = False
-    
+            brackets=1
+            while not brackets==0:
+                i+=1
+                if "}" in program_lines[i]:
+                    brackets-=1
+                if "{" in program_lines[i]:
+                    brackets+=1
+                
+            return
     elif iscom("end", linepieces):
         exit()
     
@@ -278,17 +284,8 @@ while i < len(program_lines):
         
         # make an array of the line pieces
         linepieces = lstrip.split(":")
-
-        if interpreter:
-            analyzeLine(line, linepieces)
-        else:
-            if "}" in line:
-                brackets -= 1
-                if brackets <= 0:
-                    interpreter = True
-            elif "{" in line:
-                brackets += 1
-            i += 1
+        analyzeLine(line, linepieces)
+      
         
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
