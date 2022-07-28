@@ -286,8 +286,11 @@ while i < len(program_lines):
                 brackets -= 1
                 if brackets <= 0:
                     interpreter = True
-            elif linepieces[0] == "if":
-                brackets += 1
+            
+            for piece in linepieces:
+                if piece == "{":
+                    brackets += 1
+                    break
             i += 1
         
     except Exception as e:
