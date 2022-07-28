@@ -53,8 +53,55 @@ def get_nonum(num):
 def iscom(comm, linepieces):
     return comm == linepieces[0]
 
+def universalBooleanManager(linepieces, offset):
+    #check if and how many conditions we have
+    #figure out how many conditions we have
+    cons=1
+    results=[]
+    combs=[]
+    for k in linepieces:
+        if k.startswith("or") or k.startswith("and"):
+            cons+=1
+            combs.append(k)
+    for k in range(cons):
+        mop=linepieces[k*2+offset]
+        
+        comp=search_array(mop,comparators)
+        var1=get_value(mop.split(comp)[0])
+        var2=get_value(mop.split(comp)[1])
+        
+        if comp=="==":
+            results.append(var1==var2)
+        if comp=="!=":
+            results.append(var1!=var2)
+        if comp=="<=":
+            results.append(var1<=var2)
+        if comp==">=":
+            results.append(var1>=var2)
+        if comp=="<<":
+            results.append(var1<var2)
+        if comp==">>":
+            results.append(var1>var2)
 
-overwrite=""#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+    #solve the conditions
+    res=results[0]
+    for k in range(len(combs)):
+
+        if combs[k].startswith("or"):
+            if results[k+1] or res!=0:
+                res=1
+            else:
+                res=0
+        if combs[k].startswith("and"):
+            if res==1 and results[k+1]==1:
+                res=1
+            else:
+                res=0
+
+    return res
+
+
+overwrite="examples/example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -189,50 +236,8 @@ def analyzeLine(line, linepieces):
 
 
     elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
-        #check if and how many conditions we have
-        #figure out how many conditions we have
-        cons=1
-        results=[]
-        combs=[]
-        for k in linepieces:
-            if k.startswith("or") or k.startswith("and"):
-                cons+=1
-                combs.append(k)
-        for k in range(cons):
-            mop=linepieces[k*2+2]
+        res = universalBooleanManager(linepieces, 2)
 
-            
-            comp=search_array(mop,comparators)
-            var1=get_value(linepieces[k*2+2].split(comp)[0])
-            var2=get_value(linepieces[k*2+2].split(comp)[1])
-            
-            if comp=="==":
-                results.append(var1==var2)
-            if comp=="!=":
-                results.append(var1!=var2)
-            if comp=="<=":
-                results.append(var1<=var2)
-            if comp==">=":
-                results.append(var1>=var2)
-            if comp=="<<":
-                results.append(var1<var2)
-            if comp==">>":
-                results.append(var1>var2)
-
-        #solve the conditions
-        res=results[0]
-        for k in range(len(combs)):
-
-            if combs[k].startswith("or"):
-                if results[k+1] or res!=0:
-                    res=1
-                else:
-                    res=0
-            if combs[k].startswith("and"):
-                if res==1 and results[k+1]==1:
-                    res=1
-                else:
-                    res=0
         if res==1:
             if linepieces[1] in labels:
                 i=labels[linepieces[1]]
@@ -255,48 +260,7 @@ def analyzeLine(line, linepieces):
             exit()
 
     elif iscom("if", linepieces): # if : var1 comparator var2 : {
-        cons=1
-        results=[]
-        combs=[]
-        for k in linepieces:
-            if k.startswith("or") or k.startswith("and"):
-                cons+=1
-                combs.append(k)
-        for k in range(cons):
-            mop=linepieces[k*2+1]
-
-            
-            comp=search_array(mop,comparators)
-            var1=get_value(mop.split(comp)[0])
-            var2=get_value(mop.split(comp)[1])
-            
-            if comp=="==":
-                results.append(var1==var2)
-            if comp=="!=":
-                results.append(var1!=var2)
-            if comp=="<=":
-                results.append(var1<=var2)
-            if comp==">=":
-                results.append(var1>=var2)
-            if comp=="<<":
-                results.append(var1<var2)
-            if comp==">>":
-                results.append(var1>var2)
-
-        #solve the conditions
-        res=results[0]
-        for k in range(len(combs)):
-
-            if combs[k].startswith("or"):
-                if results[k+1] or res!=0:
-                    res=1
-                else:
-                    res=0
-            if combs[k].startswith("and"):
-                if res==1 and results[k+1]==1:
-                    res=1
-                else:
-                    res=0
+        res = universalBooleanManager(linepieces, 1)
 
         if not res:
             brackets=1
