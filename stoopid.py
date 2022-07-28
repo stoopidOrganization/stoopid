@@ -255,6 +255,9 @@ def analyzeLine(line, linepieces):
                     brackets-=1
                 if "{" in program_lines[i]:
                     brackets+=1
+                if brackets<0:
+                    print(f"Error in line {i+1}: Unmatched brackets")
+                    exit()
                 
             return
     elif iscom("end", linepieces):
