@@ -276,7 +276,6 @@ def analyzeLine(line, linepieces):
                         exit()
 
                 return
-
         elif iscom("end", linepieces):
             exit()
         
