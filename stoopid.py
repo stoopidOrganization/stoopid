@@ -20,6 +20,11 @@ def get_value(inp): #checks if the input is a number or a variable
     else:
         if inp in vars:
             return vars[inp]
+        elif inp in bools:
+            if bools[inp]==1:
+                return "True"
+            elif bools[inp]==0:
+                return "False"
         else:
             return inp
 
@@ -101,7 +106,7 @@ def universalBooleanManager(linepieces, offset):
     return res
 
 
-overwrite="examples/example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="examples/bool_example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -139,6 +144,7 @@ operators=["+","-","*","/","%"]
 comparators=["<<",">>","<=",">=", "==","!="]
 vars={}
 arrs={}
+bools = {}
 labels={}
 i=0
 interpreter = True
@@ -276,6 +282,20 @@ def analyzeLine(line, linepieces):
                         exit()
 
                 return
+
+        elif iscom("bool", linepieces):
+            name = get_nonum(linepieces[1]).split("=")[0]
+            value = get_value(linepieces[1].split("=")[1])
+
+            if value == "True":
+                value = 1
+            elif value == "False":
+                value = 0
+            else:
+                value = universalBooleanManager(get_nonum(linepieces[1]).split("="), 1)
+
+            bools[name] = value
+
         elif iscom("end", linepieces):
             exit()
         
@@ -294,6 +314,7 @@ def analyzeLine(line, linepieces):
 
 # main loop
 while i < len(program_lines):
+
     try:
         # get the line
         line = program_lines[i]
@@ -309,7 +330,6 @@ while i < len(program_lines):
         linepieces = lstrip.split(":")
         analyzeLine(line, linepieces)
       
-        
     except Exception as e:
         print("Critical error: " + str(e))
         exit()
