@@ -1,5 +1,7 @@
 import time, sys
 
+overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+
 libs=[]
 def is_float(number):
     try:
@@ -20,6 +22,11 @@ def get_value(inp): #checks if the input is a number or a variable
     else:
         if inp in vars:
             return vars[inp]
+        elif inp in bools:
+            if bools[inp]:
+                return 1
+            elif bools[inp]==0:
+                return 0
         else:
             return inp
 
@@ -53,8 +60,62 @@ def get_nonum(num):
 def iscom(comm, linepieces):
     return comm == linepieces[0]
 
+def universalBooleanManager(linepieces, offset):
+    #check if and how many conditions we have
+    #figure out how many conditions we have
+    for bool in bools:
+        if bool == linepieces[1]:
+            return bools[bool]
 
-overwrite=""#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+    if linepieces[1] == "True":
+        return 1
+    elif linepieces[1] == "False":
+        return 0
+    else:
+        cons=1
+        results=[]
+        combs=[]
+        for k in linepieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons+=1
+                combs.append(k)
+        for k in range(cons):
+            mop=linepieces[k*2+offset]
+            
+            comp=search_array(mop,comparators)
+            var1=get_value(mop.split(comp)[0])
+            var2=get_value(mop.split(comp)[1])
+            
+            if comp=="==":
+                results.append(var1==var2)
+            if comp=="!=":
+                results.append(var1!=var2)
+            if comp=="<=":
+                results.append(var1<=var2)
+            if comp==">=":
+                results.append(var1>=var2)
+            if comp=="<<":
+                results.append(var1<var2)
+            if comp==">>":
+                results.append(var1>var2)
+
+        #solve the conditions
+        res=results[0]
+        for k in range(len(combs)):
+
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
+                else:
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
+
+        return res
+
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -92,6 +153,7 @@ operators=["+","-","*","/","%"]
 comparators=["<<",">>","<=",">=", "==","!="]
 vars={}
 arrs={}
+bools = {}
 labels={}
 i=0
 interpreter = True
@@ -190,50 +252,8 @@ def analyzeLine(line, linepieces):
 
 
         elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
-            #check if and how many conditions we have
-            #figure out how many conditions we have
-            cons=1
-            results=[]
-            combs=[]
-            for k in linepieces:
-                if k.startswith("or") or k.startswith("and"):
-                    cons+=1
-                    combs.append(k)
-            for k in range(cons):
-                mop=linepieces[k*2+2]
+            res = universalBooleanManager(linepieces, 2)
 
-                
-                comp=search_array(mop,comparators)
-                var1=get_value(mop.split(comp)[0])
-                var2=get_value(mop.split(comp)[1])
-                
-                if comp=="==":
-                    results.append(var1==var2)
-                if comp=="!=":
-                    results.append(var1!=var2)
-                if comp=="<=":
-                    results.append(var1<=var2)
-                if comp==">=":
-                    results.append(var1>=var2)
-                if comp=="<<":
-                    results.append(var1<var2)
-                if comp==">>":
-                    results.append(var1>var2)
-
-            #solve the conditions
-            res=results[0]
-            for k in range(len(combs)):
-
-                if combs[k].startswith("or"):
-                    if results[k+1] or res!=0:
-                        res=1
-                    else:
-                        res=0
-                if combs[k].startswith("and"):
-                    if res==1 and results[k+1]==1:
-                        res=1
-                    else:
-                        res=0
             if res==1:
                 if linepieces[1] in labels:
                     i=labels[linepieces[1]]
@@ -256,48 +276,7 @@ def analyzeLine(line, linepieces):
                 exit()
 
         elif iscom("if", linepieces): # if : var1 comparator var2 : {
-            cons=1
-            results=[]
-            combs=[]
-            for k in linepieces:
-                if k.startswith("or") or k.startswith("and"):
-                    cons+=1
-                    combs.append(k)
-            for k in range(cons):
-                mop=linepieces[k*2+1]
-
-                
-                comp=search_array(mop,comparators)
-                var1=get_value(mop.split(comp)[0])
-                var2=get_value(mop.split(comp)[1])
-                
-                if comp=="==":
-                    results.append(var1==var2)
-                if comp=="!=":
-                    results.append(var1!=var2)
-                if comp=="<=":
-                    results.append(var1<=var2)
-                if comp==">=":
-                    results.append(var1>=var2)
-                if comp=="<<":
-                    results.append(var1<var2)
-                if comp==">>":
-                    results.append(var1>var2)
-
-            #solve the conditions
-            res=results[0]
-            for k in range(len(combs)):
-
-                if combs[k].startswith("or"):
-                    if results[k+1] or res!=0:
-                        res=1
-                    else:
-                        res=0
-                if combs[k].startswith("and"):
-                    if res==1 and results[k+1]==1:
-                        res=1
-                    else:
-                        res=0
+            res = universalBooleanManager(linepieces, 1)
 
             if not res:
                 brackets=1
@@ -312,6 +291,20 @@ def analyzeLine(line, linepieces):
                         exit()
 
                 return
+
+        elif iscom("bool", linepieces):
+            name = get_nonum(linepieces[1]).split("=")[0]
+            value = get_value(linepieces[1].split("=")[1])
+
+            if value == "True":
+                value = 1
+            elif value == "False":
+                value = 0
+            else:
+                value = universalBooleanManager(get_nonum(linepieces[1]).split("="), 1)
+
+            bools[name] = value
+
         elif iscom("end", linepieces):
             exit()
         
@@ -330,6 +323,7 @@ def analyzeLine(line, linepieces):
 
 # main loop
 while i < len(program_lines):
+
     try:
         # get the line
         line = program_lines[i]
@@ -345,7 +339,6 @@ while i < len(program_lines):
         linepieces = lstrip.split(":")
         analyzeLine(line, linepieces)
       
-        
     except Exception as e:
         print("Critical error: " + str(e))
         exit()

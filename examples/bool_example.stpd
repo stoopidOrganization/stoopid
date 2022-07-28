@@ -1,0 +1,6 @@
+bool : test = True
+bool : test2 = False
+bool : test3 = 2 << 3
+bool : test4 = 2 >> 3
+
+out : test
