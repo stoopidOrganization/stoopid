@@ -54,7 +54,7 @@ def iscom(comm, linepieces):
     return comm == linepieces[0]
 
 
-overwrite="example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="if_example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -245,24 +245,18 @@ def analyzeLine(line, linepieces):
 
         # print(str(comp) + " " + str(interpreter))
 
-        if comp == "<<":
-            if not var1 < var2:
-                interpreter = False
-        elif comp == ">>":
-            if not var1 > var2:
-                interpreter = False
-        elif comp == "<=":
-            if not var1 <= var2:
-                interpreter = False
-        elif comp == ">=":
-            if not var1 >= var2:
-                interpreter = False
-        elif comp == "==":
-            if not var1 == var2:
-                interpreter = False
-        elif comp == "!=":
-            if not var1 != var2:
-                interpreter = False
+        if comp == "<<" and not var1 < var2:
+            interpreter = False
+        elif comp == ">>" and not var1 > var2:
+            interpreter = False
+        elif comp == "<=" and not var1 <= var2:
+            interpreter = False
+        elif comp == ">=" and not var1 >= var2:
+            interpreter = False
+        elif comp == "==" and not var1 == var2:
+            interpreter = False
+        elif comp == "!=" and not var1 != var2:
+            interpreter = False
     
     elif iscom("end", linepieces):
         exit()
@@ -294,10 +288,11 @@ while i < len(program_lines):
             linepieces = lstrip.split(":")
             
             analyzeLine(line, linepieces)
-        elif program_lines[i].startswith("}"):
-            interpreter = True
+        else:
+            if program_lines[i].startswith("}"):
+                interpreter = True
             i += 1
-
+            
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
