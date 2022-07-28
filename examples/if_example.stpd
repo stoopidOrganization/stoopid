@@ -1,6 +1,10 @@
 # for testing if statements
 var : a = 1
 var : b = 2
+
+bool : test = True
+bool : test2 = False
+
 if : a << b : {
     out : b
     if : a == b : {
@@ -9,5 +13,14 @@ if : a << b : {
     
     out : b
 }
+
+if : test : {
+    out : it-works
+}
+
+if : test2 : {
+    out : it-doesnt-work
+}
+
 math : c : a + b
 out : c
