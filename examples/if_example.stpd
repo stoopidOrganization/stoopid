@@ -6,6 +6,7 @@ if : a << b : {
     if : a == b : {
         out : a
     }
+    
     out : b
 }
 math : c : a + b

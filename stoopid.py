@@ -267,8 +267,8 @@ def analyzeLine(line, linepieces):
 
             
             comp=search_array(mop,comparators)
-            var1=get_value(linepieces[k*2+1].split(comp)[0])
-            var2=get_value(linepieces[k*2+1].split(comp)[1])
+            var1=get_value(mop.split(comp)[0])
+            var2=get_value(mop.split(comp)[1])
             
             if comp=="==":
                 results.append(var1==var2)
@@ -298,7 +298,7 @@ def analyzeLine(line, linepieces):
                 else:
                     res=0
 
-        if res:
+        if not res:
             brackets=1
             while not brackets==0:
                 i+=1
@@ -309,7 +309,7 @@ def analyzeLine(line, linepieces):
                 if brackets<0:
                     print(f"Error in line {i+1}: Unmatched brackets")
                     exit()
-                
+
             return
     elif iscom("end", linepieces):
         exit()
