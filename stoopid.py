@@ -253,7 +253,7 @@ while i<len(program_lines):
                     exit()
 
             if iscom("if"):
-
+                continue
             
             if iscom("end"):
                 exit()
@@ -261,7 +261,7 @@ while i<len(program_lines):
             for lib in libs:
                 vars=lib.run(line,vars)
             i+=1
-    
+
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
