@@ -23,10 +23,10 @@ def get_value(inp): #checks if the input is a number or a variable
         if inp in vars:
             return vars[inp]
         elif inp in bools:
-            if bools[inp]==1:
-                return "True"
+            if bools[inp]:
+                return 1
             elif bools[inp]==0:
-                return "False"
+                return 0
         else:
             return inp
 
