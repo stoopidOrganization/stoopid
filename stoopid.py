@@ -255,14 +255,50 @@ def analyzeLine(line, linepieces):
             exit()
 
     elif iscom("if", linepieces): # if : var1 comparator var2 : {
-        comp = search_array(linepieces[1], comparators)
+        cons=1
+        results=[]
+        combs=[]
+        for k in linepieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons+=1
+                combs.append(k)
+        for k in range(cons):
+            mop=linepieces[k*2+1]
 
-        var1 = get_value(str(linepieces[1]).split(comp)[0])
-        var2 = get_value(str(linepieces[1]).split(comp)[1])
+            
+            comp=search_array(mop,comparators)
+            var1=get_value(linepieces[k*2+1].split(comp)[0])
+            var2=get_value(linepieces[k*2+1].split(comp)[1])
+            
+            if comp=="==":
+                results.append(var1==var2)
+            if comp=="!=":
+                results.append(var1!=var2)
+            if comp=="<=":
+                results.append(var1<=var2)
+            if comp==">=":
+                results.append(var1>=var2)
+            if comp=="<<":
+                results.append(var1<var2)
+            if comp==">>":
+                results.append(var1>var2)
 
-        # print(str(comp) + " " + str(interpreter))
+        #solve the conditions
+        res=results[0]
+        for k in range(len(combs)):
 
-        if (comp == "<<" and not var1 < var2) or (comp == ">>" and not var1 > var2) or (comp == "<=" and not var1 <= var2) or (comp == ">=" and not var1 >= var2) or (comp == "==" and not var1 == var2) or (comp == "!=" and not var1 != var2):
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
+                else:
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
+
+        if res:
             brackets=1
             while not brackets==0:
                 i+=1
