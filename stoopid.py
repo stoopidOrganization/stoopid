@@ -130,7 +130,8 @@ i=0
 while i<len(program_lines):
     try:
         if interpreterIsOff and program_lines[i].startswith("}"):
-            i+=1
+            i += 1
+            interpreterIsOff = False
             continue
         else:
             line=program_lines[i]
