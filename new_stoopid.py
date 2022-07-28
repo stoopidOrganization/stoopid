@@ -225,6 +225,8 @@ def analyzeLine(line, linepieces):
                 i=destination
                 return
 
+        print(i)
+
     elif iscom("import", linepieces):
         #imports a stoopid library which is essentially a python library specifically for the language
         try:
@@ -269,6 +271,8 @@ def analyzeLine(line, linepieces):
         #check for any commands from the librarys
         for lib in libs:
             vars=lib.run(line,vars)
+    
+    i += 1
 
     return
 
@@ -292,8 +296,8 @@ while i < len(program_lines):
             analyzeLine(line, linepieces)
         elif program_lines[i].startswith("}"):
             interpreter = True
-        
-        i += 1
+            i += 1
+
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
