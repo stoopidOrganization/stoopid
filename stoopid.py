@@ -1,6 +1,6 @@
 import time, sys
 
-overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="examples/bool_example.stpd" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 
 libs=[]
 def is_float(number):
@@ -64,7 +64,7 @@ def universalBooleanManager(linepieces, offset):
     #check if and how many conditions we have
     #figure out how many conditions we have
     for bool in bools:
-        if bool == linepieces[1]:
+        if bool == linepieces[offset]:
             return bools[bool]
 
     if linepieces[1] == "True":
@@ -115,6 +115,23 @@ def universalBooleanManager(linepieces, offset):
                     res=0
 
         return res
+
+def hippityHoppityYouAreNowAStringPls(inp):
+    if isnumber(inp):
+        if is_float(inp):
+            return str(float(inp))
+        else:
+            return str(int(inp))
+    else:
+        if inp in vars:
+            return str(vars[inp])
+        elif inp in bools:
+            if bools[inp]:
+                return "True"
+            elif bools[inp]==0:
+                return "False"
+        else:
+            return inp
 
 if len(overwrite)==0:
     try:
@@ -215,7 +232,7 @@ def analyzeLine(line, linepieces):
         #strings are weird
 
         elif iscom("out", linepieces): #out : name
-            out=get_value(linepieces[1])
+            out=hippityHoppityYouAreNowAStringPls(linepieces[1])
             print(out)
             if logging:
                 log.write(str(out)+"\n")
