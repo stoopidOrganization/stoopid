@@ -282,15 +282,12 @@ while i < len(program_lines):
         if interpreter:
             analyzeLine(line, linepieces)
         else:
-            if linepieces[0] == "}":
+            if "}" in line:
                 brackets -= 1
                 if brackets <= 0:
                     interpreter = True
-            
-            for piece in linepieces:
-                if piece == "{":
-                    brackets += 1
-                    break
+            elif "{" in line:
+                brackets += 1
             i += 1
         
     except Exception as e:
