@@ -55,7 +55,7 @@ def iscom(comm):
     return comm==linepieces[0]
 
 
-overwrite="example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="if_example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -95,7 +95,7 @@ vars={}
 arrs={}
 labels={}
 i=0
-interpreterIsOff = False
+interpreter = True
 #validate every line (breaks external libraries)
 if val:
     for i in range(len(program_lines)):
@@ -129,11 +129,7 @@ i=0
 
 while i<len(program_lines):
     try:
-        if interpreterIsOff and program_lines[i].startswith("}"):
-            i += 1
-            interpreterIsOff = False
-            continue
-        else:
+        if interpreter:
             line=program_lines[i]
 
             if line[0].startswith=="#" or line=="\n":
@@ -252,15 +248,45 @@ while i<len(program_lines):
                     print(f"Error in line {i+1}: Library not found {linepieces[1]}")
                     exit()
 
-            if iscom("if"):
-                continue
+            if iscom("if"): # if : var1 comparator var2 : {
+                comp = search_array(linepieces[1], comparators)
+
+                var1 = get_value(str(linepieces[1]).split(comp)[0])
+                var2 = get_value(str(linepieces[1]).split(comp)[1])
+
+                print(str(comp) + " " + str(interpreter))
+
+                if comp == "<<":
+                    if not var1 < var2:
+                        interpreter = False
+                elif comp == ">>":
+                    if not var1 > var2:
+                        interpreter = False
+                elif comp == "<=":
+                    if not var1 <= var2:
+                        interpreter = False
+                elif comp == ">=":
+                    if not var1 >= var2:
+                        interpreter = False
+                elif comp == "==":
+                    if not var1 == var2:
+                        interpreter = False
+                elif comp == "!=":
+                    if not var1 != var2:
+                        interpreter = False
             
             if iscom("end"):
                 exit()
+
             #check for any commands from the librarys
             for lib in libs:
                 vars=lib.run(line,vars)
+
             i+=1
+        else:
+            i += 1
+            if program_lines[i].startswith("}"):
+                interpreter = True
 
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
