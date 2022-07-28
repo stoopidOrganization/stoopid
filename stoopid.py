@@ -144,29 +144,29 @@ while i<len(program_lines):
         if iscom("var"): # var : name = value
             vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
             
-        if iscom("arr"): # arr : name : size
+        elif iscom("arr"): # arr : name : size
             arrs[get_nonum(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
 
-        if iscom("app"): # app : name : value
+        elif iscom("app"): # app : name : value
             arrs[get_nonum(linepieces[1])].append(float(get_value(linepieces[2])))
 
-        if iscom("getarr"): # getarr : name : index : destination
+        elif iscom("getarr"): # getarr : name : index : destination
             vars[str(linepieces[3])]=arrs[str(linepieces[1])][get_value(linepieces[2])]
 
-        if iscom("setarr"): # setarr : name : index : value
+        elif iscom("setarr"): # setarr : name : index : value
             arrs[str(linepieces[1])][get_value(linepieces[2])]=get_value(linepieces[3])
 
-        if linepieces[0].strip()=="string": # string : name = value
+        elif linepieces[0].strip()=="string": # string : name = value
             vars[str(linepieces[1]).split("=")[0].strip()]=str(linepieces[1]).split("=")[1]
         #strings are weird
 
-        if iscom("out"): #out : name
+        elif iscom("out"): #out : name
             out=get_value(linepieces[1])
             print(out)
             if logging:
                 log.write(str(out)+"\n")
 
-        if iscom("goto"): #goto : line
+        elif iscom("goto"): #goto : line
             if linepieces[1] in labels:
                 i=labels[linepieces[1]]
                 continue
@@ -177,10 +177,10 @@ while i<len(program_lines):
                 exit()
             continue
 
-        if iscom("sleep"):#sleep : time
+        elif iscom("sleep"):#sleep : time
             time.sleep(float(linepieces[1]))
             
-        if iscom("math"):#math : destination : value1 operator value2
+        elif iscom("math"):#math : destination : value1 operator value2
             vardest=str(linepieces[1])
             op=search_array(linepieces[2],operators)
             var1=get_value(linepieces[2].split(op)[0])
@@ -196,47 +196,63 @@ while i<len(program_lines):
             if op=="%":
                 vars[vardest]=var1%var2
 
-        if iscom("goif"): #goif : destination : var1  comparator  var2 
-            comp=search_array(linepieces[2],comparators)
-            var1=get_value(str(linepieces[2]).split(comp)[0])
-            var2=get_value(str(linepieces[2]).split(comp)[1])
-            if linepieces[1] in labels:
-                destination=labels[linepieces[1]]
-            else:
+        elif iscom("goif"): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
+            #check if and how many conditions we have
+            #figure out how many conditions we have
+            cons=1
+            results=[]
+            combs=[]
+            for k in linepieces:
+                if k.startswith("or") or k.startswith("and"):
+                    cons+=1
+                    combs.append(k)
+            for k in range(cons):
+                mop=linepieces[k*2+2]
+
                 
-                destination=get_value(linepieces[1])
-                if not isnumber(destination):
-                    print(f"Error in line {i+1}: Destination is not a number")
+                comp=search_array(mop,comparators)
+                var1=get_value(linepieces[k*2+2].split(comp)[0])
+                var2=get_value(linepieces[k*2+2].split(comp)[1])
+                
+                if comp=="==":
+                    results.append(var1==var2)
+                if comp=="!=":
+                    results.append(var1!=var2)
+                if comp=="<=":
+                    results.append(var1<=var2)
+                if comp==">=":
+                    results.append(var1>=var2)
+                if comp=="<<":
+                    results.append(var1<var2)
+                if comp==">>":
+                    results.append(var1>var2)
+
+            #solve the conditions
+            res=results[0]
+            for k in range(len(combs)):
+
+                if combs[k].startswith("or"):
+                    if results[k+1] or res!=0:
+                        res=1
+                    else:
+                        res=0
+                if combs[k].startswith("and"):
+                    if res==1 and results[k+1]==1:
+                        res=1
+                    else:
+                        res=0
+            if res==1:
+                if linepieces[1] in labels:
+                    i=labels[linepieces[1]]
+                    continue
+                try:
+                    i=int(linepieces[1])-1
+                except:
+                    print(f"Error in line {i+1}: Label not found {linepieces[1]}")
                     exit()
-                else:
-                    destination=int(destination)-1
-            
-            if comp=="<<":
-                if var1<var2:
-                    i=destination
-                    continue
-            if comp==">>":
-                if var1>var2:
-                    i=destination
-                    continue
-            if comp=="<=":
-                if var1<=var2:
-                    i=destination
-                    continue
-            if comp==">=":
-                if var1>=var2:
-                    i=destination
-                    continue
-            if comp=="==":
-                if var1==var2:
-                    i=destination
-                    continue
-            if comp=="!=":
-                if var1!=var2:
-                    i=destination
-                    continue
-        
-        if iscom("import"):
+                continue
+                        
+        elif iscom("import"):
             #imports a stoopid library which is essentially a python library specifically for the language
             try:
                 a=__import__(str(linepieces[1])) #set the name of the library to after the path
@@ -245,7 +261,7 @@ while i<len(program_lines):
             except:
                 print(f"Error in line {i+1}: Library not found {linepieces[1]}")
                 exit()
-        if iscom("end"):
+        elif iscom("end"):
             exit()
         #check for any commands from the librarys
         for lib in libs:
