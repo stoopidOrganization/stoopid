@@ -55,7 +55,7 @@ def iscom(comm):
     return comm==linepieces[0]
 
 
-overwrite="if_example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -127,10 +127,12 @@ while i<len(program_lines):
     i+=1
 i=0
 
-while i<len(program_lines):
+while i < len(program_lines):
+    # print(program_lines[i])
+
     try:
         if interpreter:
-            line=program_lines[i]
+            line = program_lines[i]
 
             if line[0].startswith=="#" or line=="\n":
                 i+=1
@@ -254,7 +256,7 @@ while i<len(program_lines):
                 var1 = get_value(str(linepieces[1]).split(comp)[0])
                 var2 = get_value(str(linepieces[1]).split(comp)[1])
 
-                print(str(comp) + " " + str(interpreter))
+                # print(str(comp) + " " + str(interpreter))
 
                 if comp == "<<":
                     if not var1 < var2:
@@ -282,11 +284,11 @@ while i<len(program_lines):
             for lib in libs:
                 vars=lib.run(line,vars)
 
-            i+=1
         else:
-            i += 1
             if program_lines[i].startswith("}"):
                 interpreter = True
+                
+        i += 1
 
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
