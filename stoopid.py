@@ -54,7 +54,7 @@ def iscom(comm, linepieces):
     return comm == linepieces[0]
 
 
-overwrite="examples/if_example.stpd"#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite=""#this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -187,47 +187,62 @@ def analyzeLine(line, linepieces):
         if op=="%":
             vars[vardest]=var1%var2
 
-    elif iscom("goif", linepieces): #goif : destination : var1  comparator  var2 
-        comp=search_array(linepieces[2],comparators)
-        var1=get_value(str(linepieces[2]).split(comp)[0])
-        var2=get_value(str(linepieces[2]).split(comp)[1])
-        if linepieces[1] in labels:
-            destination=labels[linepieces[1]]
-        else:
-            
-            destination=get_value(linepieces[1])
-            if not isnumber(destination):
-                print(f"Error in line {i+1}: Destination is not a number")
-                exit()
-            else:
-                destination=int(destination)-1
-        
-        if comp=="<<":
-            if var1<var2:
-                i=destination
-                return
-        if comp==">>":
-            if var1>var2:
-                i=destination
-                return
-        if comp=="<=":
-            if var1<=var2:
-                i=destination
-                return
-        if comp==">=":
-            if var1>=var2:
-                i=destination
-                return
-        if comp=="==":
-            if var1==var2:
-                i=destination
-                return
-        if comp=="!=":
-            if var1!=var2:
-                i=destination
-                return
 
-        print(i)
+    elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
+        #check if and how many conditions we have
+        #figure out how many conditions we have
+        cons=1
+        results=[]
+        combs=[]
+        for k in linepieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons+=1
+                combs.append(k)
+        for k in range(cons):
+            mop=linepieces[k*2+2]
+
+            
+            comp=search_array(mop,comparators)
+            var1=get_value(linepieces[k*2+2].split(comp)[0])
+            var2=get_value(linepieces[k*2+2].split(comp)[1])
+            
+            if comp=="==":
+                results.append(var1==var2)
+            if comp=="!=":
+                results.append(var1!=var2)
+            if comp=="<=":
+                results.append(var1<=var2)
+            if comp==">=":
+                results.append(var1>=var2)
+            if comp=="<<":
+                results.append(var1<var2)
+            if comp==">>":
+                results.append(var1>var2)
+
+        #solve the conditions
+        res=results[0]
+        for k in range(len(combs)):
+
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
+                else:
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
+        if res==1:
+            if linepieces[1] in labels:
+                i=labels[linepieces[1]]
+                return
+            try:
+                i=int(linepieces[1])-1
+            except:
+                print(f"Error in line {i+1}: Label not found {linepieces[1]}")
+                exit()
+            return
 
     elif iscom("import", linepieces):
         #imports a stoopid library which is essentially a python library specifically for the language
