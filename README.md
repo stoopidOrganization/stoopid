@@ -58,3 +58,6 @@ eg.: math: a : b+c*d #Invalid because of multiple operators
 
 
 libraries will be executed on each line with the run() function.
+
+the goif function can take many arguments if you append :or: or :and: to the end of the line
+The ors and ands are executed strictly left to right.

@@ -196,46 +196,62 @@ while i<len(program_lines):
             if op=="%":
                 vars[vardest]=var1%var2
 
-        elif iscom("goif"): #goif : destination : var1  comparator  var2 
-            comp=search_array(linepieces[2],comparators)
-            var1=get_value(str(linepieces[2]).split(comp)[0])
-            var2=get_value(str(linepieces[2]).split(comp)[1])
-            if linepieces[1] in labels:
-                destination=labels[linepieces[1]]
-            else:
+        elif iscom("goif"): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
+            #check if and how many conditions we have
+            #figure out how many conditions we have
+            cons=1
+            results=[]
+            combs=[]
+            for k in linepieces:
+                if k.startswith("or") or k.startswith("and"):
+                    cons+=1
+                    combs.append(k)
+            for k in range(cons):
+                mop=linepieces[k*2+2]
+
                 
-                destination=get_value(linepieces[1])
-                if not isnumber(destination):
-                    print(f"Error in line {i+1}: Destination is not a number")
+                comp=search_array(mop,comparators)
+                var1=get_value(linepieces[k*2+2].split(comp)[0])
+                var2=get_value(linepieces[k*2+2].split(comp)[1])
+                
+                if comp=="==":
+                    results.append(var1==var2)
+                if comp=="!=":
+                    results.append(var1!=var2)
+                if comp=="<=":
+                    results.append(var1<=var2)
+                if comp==">=":
+                    results.append(var1>=var2)
+                if comp=="<<":
+                    results.append(var1<var2)
+                if comp==">>":
+                    results.append(var1>var2)
+
+            #solve the conditions
+            res=results[0]
+            for k in range(len(combs)):
+
+                if combs[k].startswith("or"):
+                    if results[k+1] or res!=0:
+                        res=1
+                    else:
+                        res=0
+                if combs[k].startswith("and"):
+                    if res==1 and results[k+1]==1:
+                        res=1
+                    else:
+                        res=0
+            if res==1:
+                if linepieces[1] in labels:
+                    i=labels[linepieces[1]]
+                    continue
+                try:
+                    i=int(linepieces[1])-1
+                except:
+                    print(f"Error in line {i+1}: Label not found {linepieces[1]}")
                     exit()
-                else:
-                    destination=int(destination)-1
-            
-            if comp=="<<":
-                if var1<var2:
-                    i=destination
-                    continue
-            elif comp==">>":
-                if var1>var2:
-                    i=destination
-                    continue
-            elif comp=="<=":
-                if var1<=var2:
-                    i=destination
-                    continue
-            elif comp==">=":
-                if var1>=var2:
-                    i=destination
-                    continue
-            elif comp=="==":
-                if var1==var2:
-                    i=destination
-                    continue
-            elif comp=="!=":
-                if var1!=var2:
-                    i=destination
-                    continue
-        
+                continue
+                        
         elif iscom("import"):
             #imports a stoopid library which is essentially a python library specifically for the language
             try:
