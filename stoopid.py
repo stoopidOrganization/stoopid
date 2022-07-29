@@ -1,6 +1,6 @@
 import time, sys
 
-overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="examples/bool_example.stpd" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 
 libs=[]
 def is_float(number):
@@ -63,14 +63,15 @@ def iscom(comm, linepieces):
 def universalBooleanManager(linepieces, offset):
     #check if and how many conditions we have
     #figure out how many conditions we have
-    for bool in bools:
-        if bool == linepieces[offset]:
-            return bools[bool]
+    if linepieces[offset + 1] == "{":
+        for bool in bools:
+            if bool == linepieces[offset]:
+                return bools[bool]
 
-    if linepieces[1] == "True":
-        return 1
-    elif linepieces[1] == "False":
-        return 0
+        if linepieces[1] == "True":
+            return 1
+        elif linepieces[1] == "False":
+            return 0
     else:
         cons=1
         results=[]
