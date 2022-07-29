@@ -329,6 +329,7 @@ def analyzeLine(line, linepieces):
         return
     except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
 # main loop
