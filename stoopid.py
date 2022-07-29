@@ -64,7 +64,7 @@ def universalBooleanManager(linepieces, offset):
     #check if and how many conditions we have
     #figure out how many conditions we have
     for bool in bools:
-        if bool == linepieces[1]:
+        if bool == linepieces[offset]:
             return bools[bool]
 
     if linepieces[1] == "True":
@@ -215,7 +215,10 @@ def analyzeLine(line, linepieces):
         #strings are weird
 
         elif iscom("out", linepieces): #out : name
-            out=get_value(linepieces[1])
+            if linepieces[1] in bools:
+                out = ["False","True"][int(bools[linepieces[1]])]
+            else:
+                out = get_value(linepieces[1])
             print(out)
             if logging:
                 log.write(str(out)+"\n")
