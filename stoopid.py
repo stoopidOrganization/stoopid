@@ -60,6 +60,12 @@ def get_nonum(num):
 def iscom(comm, linepieces):
     return comm == linepieces[0]
 
+def convertToBool(var):
+    if var == "True" or var == "False":
+        return {"True":1, "False":0}[var]
+    else:
+        return var
+
 def universalBooleanManager(linepieces, offset):
     #check if and how many conditions we have
     #figure out how many conditions we have
@@ -85,6 +91,9 @@ def universalBooleanManager(linepieces, offset):
             comp=search_array(mop,comparators)
             var1=get_value(mop.split(comp)[0])
             var2=get_value(mop.split(comp)[1])
+            
+            var1 = convertToBool(var1)
+            var2 = convertToBool(var2)
             
             if comp=="==":
                 results.append(var1==var2)
@@ -253,7 +262,6 @@ def analyzeLine(line, linepieces):
             if op=="%":
                 vars[vardest]=var1%var2
 
-
         elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
             res = universalBooleanManager(linepieces, 2)
 
@@ -319,7 +327,7 @@ def analyzeLine(line, linepieces):
         i += 1
 
         return
-    except Exception:
+    except Exception as e:
         print("Error at line "+str(i+1)+": "+str(e))
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
