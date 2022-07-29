@@ -116,23 +116,6 @@ def universalBooleanManager(linepieces, offset):
 
         return res
 
-def hippityHoppityYouAreNowAStringPls(inp):
-    if isnumber(inp):
-        if is_float(inp):
-            return str(float(inp))
-        else:
-            return str(int(inp))
-    else:
-        if inp in vars:
-            return str(vars[inp])
-        elif inp in bools:
-            if bools[inp]:
-                return "True"
-            elif bools[inp]==0:
-                return "False"
-        else:
-            return inp
-
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -232,7 +215,10 @@ def analyzeLine(line, linepieces):
         #strings are weird
 
         elif iscom("out", linepieces): #out : name
-            out=hippityHoppityYouAreNowAStringPls(linepieces[1])
+            if linepieces[1] in bools:
+                out = ["False","True"][int(bools[linepieces[1]])]
+            else:
+                out = get_value(linepieces[1])
             print(out)
             if logging:
                 log.write(str(out)+"\n")
