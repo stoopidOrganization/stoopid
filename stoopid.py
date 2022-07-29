@@ -67,64 +67,69 @@ def convertToBool(var):
         return var
 
 def universalBooleanManager(linepieces, offset):
-    #check if and how many conditions we have
-    #figure out how many conditions we have
-    for bool in bools:
-        if bool == linepieces[offset]:
-            return bools[bool]
+    try:
+        #check if and how many conditions we have
+        #figure out how many conditions we have
+        if linepieces[offset] in bools and 0:
+            for bool in bools:
+                if bool == linepieces[offset]:
+                    return bools[bool]#nils, you cant just return the first bool you find, pls fix this
 
-    if linepieces[1] == "True":
-        return 1
-    elif linepieces[1] == "False":
-        return 0
-    else:
-        cons=1
-        results=[]
-        combs=[]
-        for k in linepieces:
-            if k.startswith("or") or k.startswith("and"):
-                cons+=1
-                combs.append(k)
-        for k in range(cons):
-            mop=linepieces[k*2+offset]
-            
-            comp=search_array(mop,comparators)
-            var1=get_value(mop.split(comp)[0])
-            var2=get_value(mop.split(comp)[1])
-            
-            var1 = convertToBool(var1)
-            var2 = convertToBool(var2)
-            
-            if comp=="==":
-                results.append(var1==var2)
-            if comp=="!=":
-                results.append(var1!=var2)
-            if comp=="<=":
-                results.append(var1<=var2)
-            if comp==">=":
-                results.append(var1>=var2)
-            if comp=="<<":
-                results.append(var1<var2)
-            if comp==">>":
-                results.append(var1>var2)
+        if linepieces[1] == "True":
+            return 1
+        elif linepieces[1] == "False":
+            return 0
+        #again, you need to check for ors and ands and comparisons.
+        else:
+            cons=1
+            results=[]
+            combs=[]
+            for k in linepieces:
+                if k.startswith("or") or k.startswith("and"):
+                    cons+=1
+                    combs.append(k)
+            for k in range(cons):
+                mop=linepieces[k*2+offset]
+                
+                comp=search_array(mop,comparators)
+                var1=get_value(mop.split(comp)[0])
+                var2=get_value(mop.split(comp)[1])
+                
+                var1 = convertToBool(var1)
+                var2 = convertToBool(var2)
+                if comp=="==":
+                    results.append(var1==var2)
+                if comp=="!=":
+                    results.append(var1!=var2)
+                if comp=="<=":
+                    results.append(var1<=var2)
+                if comp==">=":
+                    results.append(var1>=var2)
+                if comp=="<<":
+                    results.append(var1<var2)
+                if comp==">>":
+                    results.append(var1>var2)
 
-        #solve the conditions
-        res=results[0]
-        for k in range(len(combs)):
+            #solve the conditions
+            res=results[0]
+            for k in range(len(combs)):
 
-            if combs[k].startswith("or"):
-                if results[k+1] or res!=0:
-                    res=1
-                else:
-                    res=0
-            if combs[k].startswith("and"):
-                if res==1 and results[k+1]==1:
-                    res=1
-                else:
-                    res=0
+                if combs[k].startswith("or"):
+                    if results[k+1] or res!=0:
+                        res=1
+                    else:
+                        res=0
+                if combs[k].startswith("and"):
+                    if res==1 and results[k+1]==1:
+                        res=1
+                    else:
+                        res=0
 
-        return res
-
+            return res
+    except Exception as e:
+        print(f"Error in line {i+1}: Boolean error, {e}")
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        exit()
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
