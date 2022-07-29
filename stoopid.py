@@ -89,7 +89,7 @@ def universalBooleanManager(linepieces, offset):
                     cons+=1
                     combs.append(k)
             for k in range(cons):
-                mop=linepieces[k*2+offset]
+                mop=linepieces[k*2+offset].replace("{","").replace("}","")
                 
                 comp=search_array(mop,comparators)
                 var1=get_value(mop.split(comp)[0])
