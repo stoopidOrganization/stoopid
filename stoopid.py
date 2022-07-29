@@ -66,7 +66,7 @@ def convertToBool(var):
     else:
         return var
 
-def universalBooleanManager(linepieces, offset):
+def boolMan(linepieces, offset):
     try:
         #check if and how many conditions we have
         #figure out how many conditions we have
@@ -268,7 +268,7 @@ def analyzeLine(line, linepieces):
                 vars[vardest]=var1%var2
 
         elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
-            res = universalBooleanManager(linepieces, 2)
+            res = boolMan(linepieces, 2)
 
             if res==1:
                 if linepieces[1] in labels:
@@ -292,7 +292,7 @@ def analyzeLine(line, linepieces):
                 exit()
 
         elif iscom("if", linepieces): # if : var1 comparator var2 : {
-            res = universalBooleanManager(linepieces, 1)
+            res = boolMan(linepieces, 1)
 
             if not res:
                 brackets=1
@@ -317,7 +317,7 @@ def analyzeLine(line, linepieces):
             elif value == "False":
                 value = 0
             else:
-                value = universalBooleanManager(get_nonum(linepieces[1]).split("="), 1)
+                value = boolMan(get_nonum(linepieces[1]).split("="), 1)
 
             bools[name] = value
 
