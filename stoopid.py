@@ -3,6 +3,7 @@ import time, sys
 overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 
 libs=[]
+
 def is_float(number):
     try:
     #check if the number could be represented as an int
@@ -12,6 +13,7 @@ def is_float(number):
             return True
     except ValueError:
         return False
+
 
 def get_value(inp): #checks if the input is a number or a variable
     if isnumber(inp):
@@ -45,16 +47,11 @@ def isnumber(string):
     except ValueError:
         return False
 
-def get_comparator(line):
-    #search for the comparator in the line
-    for comparator in comparators:
-        if comparator in line:
-            return comparator
-
+    
 def get_nonum(num):
     global i
     if isnumber(num):
-        print(f"Error in line {i+1}: Cannot use numbers in this context")
+        print(f"Error in line {i+1}: String expected, but got number: {num}")
     return num
 
 def iscom(comm, linepieces):
@@ -66,18 +63,20 @@ def convertToBool(var):
     else:
         return var
 
-def boolMan(linepieces, offset):
+def boolSolv(linepieces): #checks bools and resolves them
     try:
+        for k in range(len(linepieces)):
+            linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
         #check if and how many conditions we have
         #figure out how many conditions we have
-        if linepieces[offset] in bools and 0:
+        if linepieces[0] in bools and 0:
             for bool in bools:
-                if bool == linepieces[offset]:
+                if bool == linepieces[0]:
                     return bools[bool]#nils, you cant just return the first bool you find, pls fix this
 
-        if linepieces[1] == "True":
+        if linepieces[0] == "True":
             return 1
-        elif linepieces[1] == "False":
+        elif linepieces[0] == "False":
             return 0
         #again, you need to check for ors and ands and comparisons.
         else:
@@ -89,7 +88,7 @@ def boolMan(linepieces, offset):
                     cons+=1
                     combs.append(k)
             for k in range(cons):
-                mop=linepieces[k*2+offset].replace("{","").replace("}","")
+                mop=linepieces[k*2+0].replace("{","").replace("}","")
                 
                 comp=search_array(mop,comparators)
                 var1=get_value(mop.split(comp)[0])
@@ -268,7 +267,7 @@ def analyzeLine(line, linepieces):
                 vars[vardest]=var1%var2
 
         elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
-            res = boolMan(linepieces, 2)
+            res = boolSolv(linepieces[2:])
 
             if res==1:
                 if linepieces[1] in labels:
@@ -292,7 +291,7 @@ def analyzeLine(line, linepieces):
                 exit()
 
         elif iscom("if", linepieces): # if : var1 comparator var2 : {
-            res = boolMan(linepieces, 1)
+            res = boolSolv(linepieces[1:])
 
             if not res:
                 brackets=1
@@ -317,7 +316,7 @@ def analyzeLine(line, linepieces):
             elif value == "False":
                 value = 0
             else:
-                value = boolMan(get_nonum(linepieces[1]).split("="), 1)
+                value = boolSolv(get_nonum(linepieces[1]).split("="), 1)
 
             bools[name] = value
 
