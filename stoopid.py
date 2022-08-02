@@ -38,6 +38,8 @@ def search_array(string, array):
             return array[k]
     global i
     print(f"Error in line {i+1}: String search failed. Element {string} not found in array: \n{array}")
+    print("Keep in mind, that handeling booleans is currently partly disabled due to a bug, which will cause this message to appear.")
+    print("If you want to force full boolean support, then add the --forcebool argument. This might cause issues with or & and statements.")
     exit()
 
 def isnumber(string):
@@ -69,7 +71,7 @@ def boolSolv(linepieces): #checks bools and resolves them
             linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
         #check if and how many conditions we have
         #figure out how many conditions we have
-        if linepieces[0] in bools and 0:
+        if linepieces[0] in bools and forcebool:
             for bool in bools:
                 if bool == linepieces[0]:
                     return bools[bool]#nils, you cant just return the first bool you find, pls fix this
@@ -158,6 +160,12 @@ if "--validate" in sys.argv:
 else:
     val=0
 
+
+if "--forcebool" in sys.argv:
+    forcebool=1
+else:
+    forcebool=0
+
 with open(file_name, "r") as f:
     program_lines = f.readlines()
 
@@ -196,7 +204,7 @@ while i<len(program_lines):
     if line.startswith("string"):
         lstrip=line.replace("\n","")
     else:
-        lstrip=line.replace(" ","").replace("\n","")
+        lstrip=line.replace(" ","").replace("\t","").replace("\n","")
     linepieces=lstrip.split(":")
 
     if linepieces[-1]=="label":# :name:label at the end of the line
@@ -316,7 +324,7 @@ def analyzeLine(line, linepieces):
             elif value == "False":
                 value = 0
             else:
-                value = boolSolv(get_nonum(linepieces[1]).split("="), 1)
+                value = boolSolv(get_nonum(linepieces[1]).split("=")[1:])
 
             bools[name] = value
 
