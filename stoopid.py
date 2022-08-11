@@ -159,12 +159,6 @@ if "--validate" in sys.argv:
 else:
     val=0
 
-
-if "--forcebool" in sys.argv:
-    forcebool=1
-else:
-    forcebool=0
-
 with open(file_name, "r") as f:
     program_lines = f.readlines()
 
