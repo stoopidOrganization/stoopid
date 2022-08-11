@@ -14,3 +14,7 @@ if : test == True : {
 if : False : or : 2 >> 3 : {
     out : hi3
 }
+
+if : True : {
+    out : hi4
+}
