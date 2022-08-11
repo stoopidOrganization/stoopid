@@ -3,12 +3,14 @@ bool : test2 = False
 bool : test3 = 2 << 3
 bool : test4 = 2 >> 3
 
-out : test
-
-if : test : {
+if : test : or : test4 : {
     out : hi
 }
 
 if : test == True : {
     out : hi2
+}
+
+if : False : or : 2 >> 3 : {
+    out : hi3
 }

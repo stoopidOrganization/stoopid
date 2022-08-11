@@ -37,11 +37,7 @@ def search_array(string, array):
     for k in range(len(array)):
         if array[k] in string:
             return array[k]
-    global i
-    print(f"Error in line {i+1}: String search failed. Element {string} not found in array: \n{array}")
-    print("Keep in mind, that handeling booleans is currently partly disabled due to a bug, which will cause this message to appear.")
-    print("If you want to force full boolean support, then add the --forcebool argument. This might cause issues with or & and statements.")
-    exit()
+    return -1
 
 def isnumber(string):
     try:
@@ -68,37 +64,34 @@ def convertToBool(var):
 
 def boolSolv(linepieces): #checks bools and resolves them
     try:
+        # get clean linepieces
         for k in range(len(linepieces)):
             linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
-        #check if and how many conditions we have
-        #figure out how many conditions we have
-        if linepieces[0] in bools and forcebool:
-            for bool in bools:
-                if bool == linepieces[0]:
-                    return bools[bool]#nils, you cant just return the first bool you find, pls fix this
 
-        if linepieces[0] == "True":
-            return 1
-        elif linepieces[0] == "False":
-            return 0
-        #again, you need to check for ors and ands and comparisons.
-        else:
-            cons=1
-            results=[]
-            combs=[]
-            for k in linepieces:
-                if k.startswith("or") or k.startswith("and"):
-                    cons+=1
-                    combs.append(k)
-            for k in range(cons):
-                mop=linepieces[k*2+0].replace("{","").replace("}","")
-                
-                comp=search_array(mop,comparators)
+        cons=1
+        results=[]
+        combs=[]
+
+        # get all conditions to solve
+        for k in linepieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons+=1
+                combs.append(k)
+
+        # solve all single conditions
+        for k in range(cons):
+            mop=linepieces[k*2+0].replace("{","").replace("}","")
+            
+            comp=search_array(mop,comparators)
+            if comp == -1:
+                results.append(get_value(mop))
+            else:
                 var1=get_value(mop.split(comp)[0])
                 var2=get_value(mop.split(comp)[1])
-                
+
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
+
                 if comp=="==":
                     results.append(var1==var2)
                 if comp=="!=":
@@ -112,26 +105,27 @@ def boolSolv(linepieces): #checks bools and resolves them
                 if comp==">>":
                     results.append(var1>var2)
 
-            #solve the conditions
-            res=results[0]
-            for k in range(len(combs)):
+        #solve the whole conditions
+        res=results[0]
+        for k in range(len(combs)):
 
-                if combs[k].startswith("or"):
-                    if results[k+1] or res!=0:
-                        res=1
-                    else:
-                        res=0
-                if combs[k].startswith("and"):
-                    if res==1 and results[k+1]==1:
-                        res=1
-                    else:
-                        res=0
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
+                else:
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
 
-            return res
+        return res
     except Exception as e:
         print(f"Error in line {i+1}: Boolean error, {e}")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
+
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -160,12 +154,6 @@ if "--validate" in sys.argv:
     val=1
 else:
     val=0
-
-
-if "--forcebool" in sys.argv:
-    forcebool=1
-else:
-    forcebool=0
 
 with open(file_name, "r") as f:
     program_lines = f.readlines()
