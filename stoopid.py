@@ -156,9 +156,8 @@ if "--log" in sys.argv:
         time.sleep(5)
         exit()
     log=open(log_file, "w")
-else:
-    logging=0
 
+silent="--silent" in sys.argv
 
 if "--validate" in sys.argv:
     val=1
@@ -219,7 +218,7 @@ i=0
 
 def analyzeLine(line, linepieces):
     try:
-        global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets
+        global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets, silent
 
         if iscom("var", linepieces): # var : name = value
             vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
@@ -245,7 +244,8 @@ def analyzeLine(line, linepieces):
                 out = ["False","True"][int(bools[linepieces[1]])]
             else:
                 out = get_value(linepieces[1])
-            print(out)
+            if not silent:
+                print(out)
             if logging:
                 log.write(str(out)+"\n")
 
