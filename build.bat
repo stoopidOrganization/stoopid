@@ -1,3 +1,8 @@
+@echo off
 pyinstaller --noconfirm --onefile --console --icon "stoopidlogo.ico"  "stoopid.py"
 move dist\stoopid.exe stoopid.exe
-del dist
+echo Starting cleanup...
+del dist /F /Q /S
+del build /F /Q /S
+rmdir build /S /Q
+rmdir dist /S /Q
