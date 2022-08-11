@@ -1,3 +1,6 @@
+
+![stoopidlogo](https://user-images.githubusercontent.com/69861550/184194331-30fd7818-ddd2-4f15-8d57-05261de49395.png)
+
 Usage: 
 (python version) python stoopid.py <inputfile>
 
