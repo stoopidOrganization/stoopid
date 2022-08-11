@@ -64,62 +64,60 @@ def convertToBool(var):
 
 def boolSolv(linepieces): #checks bools and resolves them
     try:
+        # get clean linepieces
         for k in range(len(linepieces)):
             linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
-        # check if and how many conditions we have
-        # figure out how many conditions we have
 
-        if linepieces[0] == "True":
-            return 1
-        elif linepieces[0] == "False":
-            return 0
-        else:
-            cons=1
-            results=[]
-            combs=[]
-            for k in linepieces:
-                if k.startswith("or") or k.startswith("and"):
-                    cons+=1
-                    combs.append(k)
-            for k in range(cons):
-                mop=linepieces[k*2+0].replace("{","").replace("}","")
+        cons=1
+        results=[]
+        combs=[]
+
+        # get all conditions to solve
+        for k in linepieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons+=1
+                combs.append(k)
+
+        # solve all single conditions
+        for k in range(cons):
+            mop=linepieces[k*2+0].replace("{","").replace("}","")
+            
+            comp=search_array(mop,comparators)
+            if comp == -1:
+                results.append(get_value(mop))
+            else:
+                var1=get_value(mop.split(comp)[0])
+                var2=get_value(mop.split(comp)[1])
                 
-                comp=search_array(mop,comparators)
-                if comp == -1:
-                    results.append(get_value(mop))
+                var1 = convertToBool(var1)
+                var2 = convertToBool(var2)
+                if comp=="==":
+                    results.append(var1==var2)
+                if comp=="!=":
+                    results.append(var1!=var2)
+                if comp=="<=":
+                    results.append(var1<=var2)
+                if comp==">=":
+                    results.append(var1>=var2)
+                if comp=="<<":
+                    results.append(var1<var2)
+                if comp==">>":
+                    results.append(var1>var2)
+
+        #solve the whole conditions
+        res=results[0]
+        for k in range(len(combs)):
+
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
                 else:
-                    var1=get_value(mop.split(comp)[0])
-                    var2=get_value(mop.split(comp)[1])
-                    
-                    var1 = convertToBool(var1)
-                    var2 = convertToBool(var2)
-                    if comp=="==":
-                        results.append(var1==var2)
-                    if comp=="!=":
-                        results.append(var1!=var2)
-                    if comp=="<=":
-                        results.append(var1<=var2)
-                    if comp==">=":
-                        results.append(var1>=var2)
-                    if comp=="<<":
-                        results.append(var1<var2)
-                    if comp==">>":
-                        results.append(var1>var2)
-
-            #solve the conditions
-            res=results[0]
-            for k in range(len(combs)):
-
-                if combs[k].startswith("or"):
-                    if results[k+1] or res!=0:
-                        res=1
-                    else:
-                        res=0
-                if combs[k].startswith("and"):
-                    if res==1 and results[k+1]==1:
-                        res=1
-                    else:
-                        res=0
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
 
             return res
     except Exception as e:
