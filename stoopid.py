@@ -1,7 +1,7 @@
 import time, sys
 from sys import exit
 
-overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="examples/bool_example.stpd" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 
 libs=[]
 
@@ -91,6 +91,7 @@ def boolSolv(linepieces): #checks bools and resolves them
                 
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
+
                 if comp=="==":
                     results.append(var1==var2)
                 if comp=="!=":
@@ -119,7 +120,7 @@ def boolSolv(linepieces): #checks bools and resolves them
                 else:
                     res=0
 
-            return res
+        return res
     except Exception as e:
         print(f"Error in line {i+1}: Boolean error, {e}")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
