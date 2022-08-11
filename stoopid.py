@@ -146,8 +146,9 @@ if len(overwrite)==0:
 else:
     file_name = overwrite
 
+logging = 0
 if "--log" in sys.argv:
-    logging=1
+    logging = 1
     #get the log file name
     try:
         log_file = sys.argv[sys.argv.index("--log")+1]
@@ -218,7 +219,7 @@ i=0
 
 def analyzeLine(line, linepieces):
     try:
-        global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets, silent
+        global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets, silent, logging
 
         if iscom("var", linepieces): # var : name = value
             vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
