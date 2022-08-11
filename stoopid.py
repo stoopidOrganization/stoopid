@@ -132,12 +132,16 @@ def boolSolv(linepieces): #checks bools and resolves them
         print(f"Error in line {i+1}: Boolean error, {e}")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
+
+consoleMode = False
+
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
     except:
-        print("see README.md for usage")
-        time.sleep(5)
+        print("--- Stoopid Console ---")
+
+        consoleMode = True
         exit()
 else:
     file_name = overwrite
