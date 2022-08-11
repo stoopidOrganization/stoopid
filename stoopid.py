@@ -37,11 +37,7 @@ def search_array(string, array):
     for k in range(len(array)):
         if array[k] in string:
             return array[k]
-    global i
-    print(f"Error in line {i+1}: String search failed. Element {string} not found in array: \n{array}")
-    print("Keep in mind, that handeling booleans is currently partly disabled due to a bug, which will cause this message to appear.")
-    print("If you want to force full boolean support, then add the --forcebool argument. This might cause issues with or & and statements.")
-    exit()
+    return -1
 
 def isnumber(string):
     try:
@@ -70,18 +66,13 @@ def boolSolv(linepieces): #checks bools and resolves them
     try:
         for k in range(len(linepieces)):
             linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
-        #check if and how many conditions we have
-        #figure out how many conditions we have
-        if linepieces[0] in bools and forcebool:
-            for bool in bools:
-                if bool == linepieces[0]:
-                    return bools[bool]#nils, you cant just return the first bool you find, pls fix this
+        # check if and how many conditions we have
+        # figure out how many conditions we have
 
         if linepieces[0] == "True":
             return 1
         elif linepieces[0] == "False":
             return 0
-        #again, you need to check for ors and ands and comparisons.
         else:
             cons=1
             results=[]
@@ -94,23 +85,26 @@ def boolSolv(linepieces): #checks bools and resolves them
                 mop=linepieces[k*2+0].replace("{","").replace("}","")
                 
                 comp=search_array(mop,comparators)
-                var1=get_value(mop.split(comp)[0])
-                var2=get_value(mop.split(comp)[1])
-                
-                var1 = convertToBool(var1)
-                var2 = convertToBool(var2)
-                if comp=="==":
-                    results.append(var1==var2)
-                if comp=="!=":
-                    results.append(var1!=var2)
-                if comp=="<=":
-                    results.append(var1<=var2)
-                if comp==">=":
-                    results.append(var1>=var2)
-                if comp=="<<":
-                    results.append(var1<var2)
-                if comp==">>":
-                    results.append(var1>var2)
+                if comp == -1:
+                    results.append(get_value(mop))
+                else:
+                    var1=get_value(mop.split(comp)[0])
+                    var2=get_value(mop.split(comp)[1])
+                    
+                    var1 = convertToBool(var1)
+                    var2 = convertToBool(var2)
+                    if comp=="==":
+                        results.append(var1==var2)
+                    if comp=="!=":
+                        results.append(var1!=var2)
+                    if comp=="<=":
+                        results.append(var1<=var2)
+                    if comp==">=":
+                        results.append(var1>=var2)
+                    if comp=="<<":
+                        results.append(var1<var2)
+                    if comp==">>":
+                        results.append(var1>var2)
 
             #solve the conditions
             res=results[0]
