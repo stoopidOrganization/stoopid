@@ -1,7 +1,7 @@
 import time, sys
 from sys import exit
 
-overwrite="examples/bool_example.stpd" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 
 libs=[]
 
@@ -125,15 +125,12 @@ def boolSolv(linepieces): #checks bools and resolves them
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
-consoleMode = False
-
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
     except:
-        print("--- Stoopid Console ---")
-
-        consoleMode = True
+        print("see README.md for usage")
+        time.sleep(5)
         exit()
 else:
     file_name = overwrite
