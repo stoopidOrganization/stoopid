@@ -236,7 +236,7 @@ def analyzeLine(line, linepieces):
         elif iscom("setarr", linepieces): # setarr : name : index : value
             arrs[str(linepieces[1])][get_value(linepieces[2])]=get_value(linepieces[3])
 
-        elif linepieces[0].strip()=="string": # string : name = value
+        elif linepieces[0].strip()=="string": # DEPRECIATED, USE VAR INSTEAD
             vars[str(linepieces[1]).split("=")[0].strip()]=str(linepieces[1]).split("=")[1]
         #strings are weird
 
