@@ -18,7 +18,7 @@ def is_float(number):
 
 def get_value(inp): #checks if the input is a number or a variable
     global vars, bools
-    inp=str(inp).replace(" ", "")
+    inp=str(inp).strip()
 
     if isnumber(inp):
         if is_float(inp):
