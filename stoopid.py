@@ -17,6 +17,9 @@ def is_float(number):
 
 
 def get_value(inp): #checks if the input is a number or a variable
+    global vars, bools
+    inp=str(inp).replace(" ", "")
+
     if isnumber(inp):
         if is_float(inp):
             return float(inp)
@@ -66,7 +69,7 @@ def boolSolv(linepieces): #checks bools and resolves them
     try:
         # get clean linepieces
         for k in range(len(linepieces)):
-            linepieces[k] = linepieces[k].replace("{", "").replace("}", "")
+            linepieces[k] = linepieces[k].replace("{", "").replace("}", "").replace(" ", "")
 
         cons=1
         results=[]
@@ -129,7 +132,16 @@ def boolSolv(linepieces): #checks bools and resolves them
         print(f"Error in line {i+1}: Boolean error, {e}")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
-
+def getline(line):
+    line.strip()
+    if line=="" or line.startswith("'"):
+        return ""
+    line=line.split("#")[0]
+    linepieces=line.split(":")
+    for k in range(len(linepieces)):
+        linepieces[k]=linepieces[k].strip()
+    return linepieces
+    
 if len(overwrite)==0:
     try:
         file_name = sys.argv[1]
@@ -210,7 +222,7 @@ def analyzeLine(line, linepieces):
         global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets, silent, logging
 
         if iscom("var", linepieces): # var : name = value
-            vars[get_nonum(linepieces[1]).split("=")[0]]=get_value((linepieces[1]).split("=")[1])
+            vars[get_nonum(linepieces[1]).split("=")[0].strip()]=get_value((linepieces[1]).split("=")[1])
 
         elif iscom("arr", linepieces): # arr : name : size
             arrs[get_nonum(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
@@ -253,10 +265,14 @@ def analyzeLine(line, linepieces):
             time.sleep(float(linepieces[1]))
 
         elif iscom("math", linepieces): #math : destination : value1 operator value2
-            vardest=str(linepieces[1])
-            op=search_array(linepieces[2],operators)
-            var1=get_value(linepieces[2].split(op)[0])
-            var2=get_value(linepieces[2].split(op)[1])
+            lp=[]
+            for k in linepieces:
+                lp.append(k.replace(" ",""))
+            vardest=str(lp[1])
+            op=search_array(lp[2],operators)
+            var1=get_value(lp[2].split(op)[0])
+            var2=get_value(lp[2].split(op)[1])
+            a=0
             if op=="+":
                 vars[vardest]=var1+var2
             if op=="-":
@@ -310,7 +326,7 @@ def analyzeLine(line, linepieces):
                 return
 
         elif iscom("bool", linepieces):
-            name = get_nonum(linepieces[1]).split("=")[0]
+            name = get_nonum(linepieces[1]).split("=")[0].strip()
             value = get_value(linepieces[1].split("=")[1])
 
             if value == "True":
@@ -338,6 +354,7 @@ def analyzeLine(line, linepieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+
 # main loop
 while i < len(program_lines):
 
@@ -345,15 +362,7 @@ while i < len(program_lines):
         # get the line
         line = program_lines[i]
 
-        # cut off the comments
-        line = line.split("#")[0]
-        if line.startswith("string"):
-            lstrip=line.replace("\n","")
-        else:
-            lstrip = line.replace(" ","").replace("\n","")
-        
-        # make an array of the line pieces
-        linepieces = lstrip.split(":")
+        linepieces = getline(line)
         analyzeLine(line, linepieces)
       
     except Exception as e:

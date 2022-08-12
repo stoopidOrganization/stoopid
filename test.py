@@ -28,13 +28,14 @@ def test_file(file):
         try:
             if o[i].strip()!=expected[i].strip():
                 print(f"{file} failed")
-                exit(1)
+                return 0
         except Exception:
             print(f"{file} failed")
-            exit(1)
+            return 0
     print(f"\n {file} passed")
     print("Cleaning up...")
     os.system("rm output.txt")
+    return 1
 
 
 
