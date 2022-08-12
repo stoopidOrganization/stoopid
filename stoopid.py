@@ -87,8 +87,12 @@ def boolSolv(linepieces): #checks bools and resolves them
             
             comp=search_array(mop,comparators)
             if comp == -1:
-                if mop in bools or mop == "True" or mop == "False":
+                if mop in bools:
                     results.append(get_value(mop))
+                elif mop == "True":
+                    results.append(1)
+                elif mop == "False":
+                    results.append(0)
                 else:
                     print(f"Error in line {i+1}: Invalid data type or comparitor not found: {mop}")
                     exit()
