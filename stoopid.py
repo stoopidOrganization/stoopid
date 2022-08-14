@@ -109,47 +109,115 @@ def getline(line):
         linepieces[k] = linepieces[k].strip()
     return linepieces
 
+## idk why this is here
+def search_array(string, array):
+    for k in range(len(array)):
+        if array[k] in string:
+            return array[k]
+    return -1
+
+## converts "booleans" to booleans
+def convertToBool(var):
+    if var == "True" or var == "False":
+        return {"True":1, "False":0}[var]
+    else:
+        return var
+
+## checks bools and resolves them
+def boolSolv(pieces):
+    global current_line, comparators
+    try:
+        # get clean linepieces
+        for k in range(len(pieces)):
+            pieces[k] = pieces[k].replace("{", "").replace("}", "").replace(" ", "")
+
+        cons = 1
+        results = []
+        combs = []
+
+        # get all conditions to solve
+        for k in pieces:
+            if k.startswith("or") or k.startswith("and"):
+                cons += 1
+                combs.append(k)
+
+        # solve all single conditions
+        for k in range(cons):
+            mop=pieces[k*2+0].replace("{","").replace("}","")
+            
+            comp = search_array(mop, comparators)
+            if comp == -1:
+                if mop in bools:
+                    results.append(get_value(mop))
+                elif mop == "True":
+                    results.append(1)
+                elif mop == "False":
+                    results.append(0)
+                else:
+                    print(f"Error in line {current_line + 1}: Invalid data type or comparitor not found: {mop}")
+                    exit()
+            else:
+                var1 = get_value(mop.split(comp)[0])
+                var2 = get_value(mop.split(comp)[1])
+
+                var1 = convertToBool(var1)
+                var2 = convertToBool(var2)
+
+                if comp=="==":
+                    results.append(var1==var2)
+                if comp=="!=":
+                    results.append(var1!=var2)
+                if comp=="<=":
+                    results.append(var1<=var2)
+                if comp==">=":
+                    results.append(var1>=var2)
+                if comp=="<<":
+                    results.append(var1<var2)
+                if comp==">>":
+                    results.append(var1>var2)
+
+        #solve the whole conditions
+        res=results[0]
+        for k in range(len(combs)):
+
+            if combs[k].startswith("or"):
+                if results[k+1] or res!=0:
+                    res=1
+                else:
+                    res=0
+            if combs[k].startswith("and"):
+                if res==1 and results[k+1]==1:
+                    res=1
+                else:
+                    res=0
+
+        return res
+    except Exception as e:
+        print(f"Error in line {current_line + 1}: Boolean error, {e}")
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        exit()
 # keyword functions
 
 ## function for out keyword
 def kwVar(pieces):
-    return
+    global vars
+    vars[get_nonum(pieces[1]).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
 
 def kwArr(pieces):
-    return
+    global arrs
+    arrs[get_nonum(pieces[1])] = [0 for i in range(int(pieces[2]))]
 
 def kwApp(pieces):
-    return
+    global arrs
+    arrs[get_nonum(pieces[1])].append(float(get_value(pieces[2])))
 
 def kwGetArr(pieces):
-    return
+    global vars, arrs
+    vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
 
 def kwSetArr(pieces):
-    return
-
-def kwGoTo(pieces):
-    return
-
-def kwSleep(pieces):
-    return
-
-def kwMath(pieces):
-    return
-
-def kwGoIf(pieces):
-    return
-
-def kwImport(pieces):
-    return
-
-def kwIf(pieces):
-    return
-
-def kwBool(pieces):
-    return
-
-def kwEnd(pieces):
-    return
+    global arrs
+    arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
 
 def kwOut(pieces):
     global bools, logging, log
@@ -161,6 +229,88 @@ def kwOut(pieces):
         print(out)
     if logging:
         log.write(str(out)+"\n")
+
+def kwGoTo(pieces):
+    global labels, current_line
+    if pieces[1] in labels:
+        current_line = labels[pieces[1]]
+        return
+    try:
+        current_line = int(pieces[1]) - 1
+    except:
+        print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
+        exit()
+    return
+
+def kwSleep(pieces):
+    time.sleep(float(pieces[1]))
+
+def kwMath(pieces):
+    global operators
+    lp = []
+    for k in pieces:
+        lp.append(k.replace(" ", ""))
+    vardest = str(lp[1])
+    op = search_array(lp[2], operators)
+    var1 = get_value(lp[2].split(op)[0])
+    var2 = get_value(lp[2].split(op)[1])
+    if op == "+":
+        vars[vardest] = var1+var2
+    elif op == "-":
+        vars[vardest] = var1-var2
+    elif op == "*":
+        vars[vardest] = var1*var2
+    elif op == "/":
+        vars[vardest] = var1/var2
+    elif op == "%":
+        vars[vardest] = var1%var2
+
+def kwGoIf(pieces):
+    global current_line, labels
+    res = boolSolv(pieces[2:])
+
+    if res == 1:
+        if pieces[1] in labels:
+            current_line = labels[pieces[1]]
+            return
+        try:
+            current_line = int(pieces[1]) - 1
+        except:
+            print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
+            exit()
+
+def kwIf(pieces):
+    global current_line
+    res = boolSolv(pieces[1:])
+
+    if not res:
+        brackets = 1
+        while not brackets == 0:
+            current_line += 1
+            if "}" in program_lines[current_line]:
+                brackets -= 1
+            if "{" in program_lines[current_line]:
+                brackets += 1
+            if brackets < 0:
+                print(f"Error in line {current_line + 1}: Unmatched brackets")
+                exit()
+
+def kwBool(pieces):
+    global bools
+    name = get_nonum(pieces[1]).split("=")[0].strip()
+    value = get_value(pieces[1].split("=")[1])
+
+    if value == "True":
+        value = 1
+    elif value == "False":
+        value = 0
+    else:
+        value = boolSolv(get_nonum(pieces[1]).split("=")[1:])
+
+    bools[name] = value
+
+def kwEnd(pieces):
+    exit()
 
 ################
 # dictionary for all keywords and their functions
@@ -178,7 +328,6 @@ keywords = {
     'sleep' : kwSleep,
     'math'  : kwMath,
     'goif' : kwGoIf,
-    'import' : kwImport,
     'if' : kwIf,
     'bool' : kwBool,
     'end' : kwEnd,
