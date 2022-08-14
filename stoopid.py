@@ -39,8 +39,21 @@ silent = "--silent" in sys.argv
 # initialize some default variables
 
 ## list of all the default usable operators and comparators
-operators = ["+","-","*","/","%"]
-comparators = ["<<",">>","<=",">=", "==","!="]
+operators = {
+    "+": lambda x,y : x + y,
+    "-": lambda x,y : x - y,
+    "*": lambda x,y : x * y,
+    "/": lambda x,y : x / y,
+    "%": lambda x,y : x % y,
+}
+comparators = {
+    "<<": lambda x,y : x < y,
+    ">>": lambda x,y : x > y,
+    "<=": lambda x,y : x <= y,
+    ">=": lambda x,y : x >= y,
+    "==": lambda x,y : x == y,
+    "!=": lambda x,y : x != y,
+}
 
 ## saves all used variables
 vars = {}
@@ -144,9 +157,9 @@ def boolSolv(pieces):
 
         # solve all single conditions
         for k in range(cons):
-            mop=pieces[k*2+0].replace("{","").replace("}","")
+            mop = pieces[k*2+0].replace("{","").replace("}","")
             
-            comp = search_array(mop, comparators)
+            comp = search_array(mop, [c for c in comparators])
             if comp == -1:
                 if mop in bools:
                     results.append(get_value(mop))
@@ -164,18 +177,7 @@ def boolSolv(pieces):
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
 
-                if comp=="==":
-                    results.append(var1==var2)
-                if comp=="!=":
-                    results.append(var1!=var2)
-                if comp=="<=":
-                    results.append(var1<=var2)
-                if comp==">=":
-                    results.append(var1>=var2)
-                if comp=="<<":
-                    results.append(var1<var2)
-                if comp==">>":
-                    results.append(var1>var2)
+                results.append(comparators[comp](var1, var2))
 
         #solve the whole conditions
         res=results[0]
@@ -252,19 +254,10 @@ def kwMath(pieces):
     for k in pieces:
         lp.append(k.replace(" ", ""))
     vardest = str(lp[1])
-    op = search_array(lp[2], operators)
+    op = search_array(lp[2], [o for o in operators])
     var1 = get_value(lp[2].split(op)[0])
     var2 = get_value(lp[2].split(op)[1])
-    if op == "+":
-        vars[vardest] = var1+var2
-    elif op == "-":
-        vars[vardest] = var1-var2
-    elif op == "*":
-        vars[vardest] = var1*var2
-    elif op == "/":
-        vars[vardest] = var1/var2
-    elif op == "%":
-        vars[vardest] = var1%var2
+    vars[vardest] = operators[op](var1, var2)
 
 def kwGoIf(pieces):
     global current_line, labels
