@@ -98,7 +98,7 @@ def get_value(inp):
                 return 0
         else:
             try:
-                return solveMath(inp)
+                return solveMath(inp, vars)
             except:
                 return inp
 
