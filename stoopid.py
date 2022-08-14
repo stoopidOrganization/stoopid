@@ -51,15 +51,6 @@ labels = {}
 ## line the interpreter is currently on
 current_line = 0
 
-################
-# dictionary for all keywords and their functions
-# add a keyword here
-# create a function for it called kw<Keyword>
-################
-keywords = {
-    "out" : "kwOut",
-}
-
 # helper functions
 ## tests if the given input is a number
 def isnumber(string):
@@ -121,6 +112,45 @@ def getline(line):
 # keyword functions
 
 ## function for out keyword
+def kwVar(pieces):
+    return
+
+def kwArr(pieces):
+    return
+
+def kwApp(pieces):
+    return
+
+def kwGetArr(pieces):
+    return
+
+def kwSetArr(pieces):
+    return
+
+def kwGoTo(pieces):
+    return
+
+def kwSleep(pieces):
+    return
+
+def kwMath(pieces):
+    return
+
+def kwGoIf(pieces):
+    return
+
+def kwImport(pieces):
+    return
+
+def kwIf(pieces):
+    return
+
+def kwBool(pieces):
+    return
+
+def kwEnd(pieces):
+    return
+
 def kwOut(pieces):
     global bools, logging, log
     if pieces[1] in bools:
@@ -131,6 +161,28 @@ def kwOut(pieces):
         print(out)
     if logging:
         log.write(str(out)+"\n")
+
+################
+# dictionary for all keywords and their functions
+# add a keyword here
+# create a function for it called kw<Keyword>
+################
+keywords = {
+    'var' : kwVar,
+    'arr' : kwArr,
+    'app' : kwApp,
+    'getarr' : kwGetArr,
+    'setarr' : kwSetArr,
+    'out' : kwOut,
+    'goto' : kwGoTo,
+    'sleep' : kwSleep,
+    'math'  : kwMath,
+    'goif' : kwGoIf,
+    'import' : kwImport,
+    'if' : kwIf,
+    'bool' : kwBool,
+    'end' : kwEnd,
+}
 
 # main loops
 
@@ -166,7 +218,9 @@ while current_line < len(program_lines):
             keywords[linepieces[0]](linepieces)
         except Exception as e:
             print(f"Error in line {current_line + 1}:\n{str(e)}")
+            print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     else:
         print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
         exit()
+    current_line += 1
