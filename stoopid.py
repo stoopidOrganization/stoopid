@@ -97,7 +97,10 @@ def get_value(inp):
             elif bools[inp] == 0:
                 return 0
         else:
-            return inp
+            try:
+                return solveMath(inp)
+            except:
+                return inp
 
 ## returns a list of all pieces in the line
 def getline(line):
@@ -123,6 +126,17 @@ def convertToBool(var):
         return {"True":1, "False":0}[var]
     else:
         return var
+
+def solveMath(equasion, vars):
+    equasion = str(equasion)
+    for i in vars:
+        print(i)
+        equasion = equasion.replace(i, str(vars[i]))
+    allowed = "=0123456789*+-/()"
+    if (all(ch in allowed for ch in equasion)):
+        return eval(equasion)
+    else:
+        raise Exception("Invalid Equasion")
 
 ## checks bools and resolves them
 def boolSolv(pieces):
