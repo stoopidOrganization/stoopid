@@ -73,6 +73,7 @@ def is_float(number):
 
 ## tests if the given input is not a number
 def get_nonum(num, lineNum):
+    global current_line
     if isnumber(num):
         print(f"Error in line {lineNum + 1}: String expected, but got number: {num}")
     return num
@@ -200,16 +201,17 @@ def boolSolv(pieces):
 
 ## function for out keyword
 def kwVar(pieces):
-    global vars
-    vars[get_nonum(pieces[1]).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
+    global vars, current_line
+    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
+    # print(vars)
 
 def kwArr(pieces):
     global arrs
-    arrs[get_nonum(pieces[1])] = [0 for i in range(int(pieces[2]))]
+    arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 def kwApp(pieces):
     global arrs
-    arrs[get_nonum(pieces[1])].append(float(get_value(pieces[2])))
+    arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
 
 def kwGetArr(pieces):
     global vars, arrs
@@ -233,20 +235,19 @@ def kwOut(pieces):
 def kwGoTo(pieces):
     global labels, current_line
     if pieces[1] in labels:
-        current_line = labels[pieces[1]]
+        current_line = labels[pieces[1]] - 1
         return
     try:
-        current_line = int(pieces[1]) - 1
+        current_line = int(pieces[1]) - 2
     except:
         print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
         exit()
-    return
 
 def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
 def kwMath(pieces):
-    global operators
+    global operators, vars
     lp = []
     for k in pieces:
         lp.append(k.replace(" ", ""))
@@ -271,10 +272,10 @@ def kwGoIf(pieces):
 
     if res == 1:
         if pieces[1] in labels:
-            current_line = labels[pieces[1]]
+            current_line = labels[pieces[1]] - 1
             return
         try:
-            current_line = int(pieces[1]) - 1
+            current_line = int(pieces[1]) - 2
         except:
             print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
             exit()
@@ -297,7 +298,7 @@ def kwIf(pieces):
 
 def kwBool(pieces):
     global bools
-    name = get_nonum(pieces[1]).split("=")[0].strip()
+    name = get_nonum(pieces[1], current_line).split("=")[0].strip()
     value = get_value(pieces[1].split("=")[1])
 
     if value == "True":
@@ -305,12 +306,15 @@ def kwBool(pieces):
     elif value == "False":
         value = 0
     else:
-        value = boolSolv(get_nonum(pieces[1]).split("=")[1:])
+        value = boolSolv(get_nonum(pieces[1], current_line).split("=")[1:])
 
     bools[name] = value
 
 def kwEnd(pieces):
     exit()
+
+def NONE(pieces):
+    return
 
 ################
 # dictionary for all keywords and their functions
@@ -331,6 +335,7 @@ keywords = {
     'if' : kwIf,
     'bool' : kwBool,
     'end' : kwEnd,
+    '}' : NONE,
 }
 
 # main loops
@@ -357,10 +362,14 @@ for i in range(len(program_lines)):
 ## runs the code
 while current_line < len(program_lines):
     # get the line
-    line = program_lines[i]
+    line = program_lines[current_line]
 
     linepieces = getline(line)
-
+    
+    if linepieces[0] == "":
+        current_line += 1
+        continue
+    
     # run the code
     if linepieces[0] in keywords:
         try:
