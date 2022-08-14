@@ -1,13 +1,69 @@
 import time, sys
 from sys import exit
 
-overwrite="" #this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+# get the system arguments
 
-libs=[]
+## get the filename
+## always the first argument
+overwrite = "" # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+if len(overwrite) == 0:
+    try:
+        file_name = sys.argv[1]
+    except:
+        print("see README.md for usage")
+        time.sleep(5)
+        exit()
+else:
+    print("Running in Override Mode")
+    file_name = overwrite
 
+with open(file_name, "r") as f:
+    program_lines = f.readlines()
+
+## prints the output of the stoopid script into a file
+logging = 0
+if "--log" in sys.argv:
+    logging = 1
+    #get the log file name
+    try:
+        log_file = sys.argv[sys.argv.index("--log")+1]
+    except:
+        print("please specify filename for log file")
+        time.sleep(5)
+        exit()
+    log = open(log_file, "w")
+
+## disables output completely
+silent = "--silent" in sys.argv
+
+# initialize some default variables
+
+## list of all the default usable operators and comparators
+operators = ["+","-","*","/","%"]
+comparators = ["<<",">>","<=",">=", "==","!="]
+
+## saves all used variables
+vars = {}
+arrs = {}
+bools = {}
+labels = {}
+
+## line the interpreter is currently on
+current_line = 0
+
+# helper functions
+## tests if the given input is a number
+def isnumber(string):
+    try:
+        float(string)
+        return True
+    except ValueError:
+        return False
+
+## checks if the given number is a float
 def is_float(number):
     try:
-    #check if the number could be represented as an int
+    # check if the number could be represented as an int
         if float(number) == int(number):
             return False
         else:
@@ -15,8 +71,15 @@ def is_float(number):
     except ValueError:
         return False
 
+## tests if the given input is not a number
+def get_nonum(num, lineNum):
+    global current_line
+    if isnumber(num):
+        print(f"Error in line {lineNum + 1}: String expected, but got number: {num}")
+    return num
 
-def get_value(inp): #checks if the input is a number or a variable
+## gets the current value of any variable
+def get_value(inp):
     global vars, bools
     inp=str(inp).strip()
 
@@ -31,61 +94,59 @@ def get_value(inp): #checks if the input is a number or a variable
         elif inp in bools:
             if bools[inp]:
                 return 1
-            elif bools[inp]==0:
+            elif bools[inp] == 0:
                 return 0
         else:
             return inp
 
+## returns a list of all pieces in the line
+def getline(line):
+    line.strip()
+    if line == "" or line.startswith("'"):
+        return ""
+    line = line.split("#")[0]
+    linepieces = line.split(":")
+    for k in range(len(linepieces)):
+        linepieces[k] = linepieces[k].strip()
+    return linepieces
+
+## idk why this is here
 def search_array(string, array):
     for k in range(len(array)):
         if array[k] in string:
             return array[k]
     return -1
 
-def isnumber(string):
-    try:
-        float(string)
-        return True
-    except ValueError:
-        return False
-
-    
-def get_nonum(num):
-    global i
-    if isnumber(num):
-        print(f"Error in line {i+1}: String expected, but got number: {num}")
-    return num
-
-def iscom(comm, linepieces):
-    return comm == linepieces[0]
-
+## converts "booleans" to booleans
 def convertToBool(var):
     if var == "True" or var == "False":
         return {"True":1, "False":0}[var]
     else:
         return var
 
-def boolSolv(linepieces): #checks bools and resolves them
+## checks bools and resolves them
+def boolSolv(pieces):
+    global current_line, comparators
     try:
         # get clean linepieces
-        for k in range(len(linepieces)):
-            linepieces[k] = linepieces[k].replace("{", "").replace("}", "").replace(" ", "")
+        for k in range(len(pieces)):
+            pieces[k] = pieces[k].replace("{", "").replace("}", "").replace(" ", "")
 
-        cons=1
-        results=[]
-        combs=[]
+        cons = 1
+        results = []
+        combs = []
 
         # get all conditions to solve
-        for k in linepieces:
+        for k in pieces:
             if k.startswith("or") or k.startswith("and"):
-                cons+=1
+                cons += 1
                 combs.append(k)
 
         # solve all single conditions
         for k in range(cons):
-            mop=linepieces[k*2+0].replace("{","").replace("}","")
+            mop=pieces[k*2+0].replace("{","").replace("}","")
             
-            comp=search_array(mop,comparators)
+            comp = search_array(mop, comparators)
             if comp == -1:
                 if mop in bools:
                     results.append(get_value(mop))
@@ -94,11 +155,11 @@ def boolSolv(linepieces): #checks bools and resolves them
                 elif mop == "False":
                     results.append(0)
                 else:
-                    print(f"Error in line {i+1}: Invalid data type or comparitor not found: {mop}")
+                    print(f"Error in line {current_line + 1}: Invalid data type or comparitor not found: {mop}")
                     exit()
             else:
-                var1=get_value(mop.split(comp)[0])
-                var2=get_value(mop.split(comp)[1])
+                var1 = get_value(mop.split(comp)[0])
+                var2 = get_value(mop.split(comp)[1])
 
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
@@ -133,242 +194,191 @@ def boolSolv(linepieces): #checks bools and resolves them
 
         return res
     except Exception as e:
-        print(f"Error in line {i+1}: Boolean error, {e}")
+        print(f"Error in line {current_line + 1}: Boolean error, {e}")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
-def getline(line):
-    line.strip()
-    if line=="" or line.startswith("'"):
-        return ""
-    line=line.split("#")[0]
-    linepieces=line.split(":")
-    for k in range(len(linepieces)):
-        linepieces[k]=linepieces[k].strip()
-    return linepieces
-    
-if len(overwrite)==0:
-    try:
-        file_name = sys.argv[1]
-    except:
-        print("see README.md for usage")
-        time.sleep(5)
-        exit()
-else:
-    file_name = overwrite
+# keyword functions
 
-logging = 0
-if "--log" in sys.argv:
-    logging = 1
-    #get the log file name
-    try:
-        log_file = sys.argv[sys.argv.index("--log")+1]
-    except:
-        print("please specify filename for log file")
-        time.sleep(5)
-        exit()
-    log=open(log_file, "w")
+## function for out keyword
+def kwVar(pieces):
+    global vars, current_line
+    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
+    # print(vars)
 
-silent="--silent" in sys.argv
+def kwArr(pieces):
+    global arrs
+    arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
-if "--validate" in sys.argv:
-    val=1
-else:
-    val=0
+def kwApp(pieces):
+    global arrs
+    arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
 
-with open(file_name, "r") as f:
-    program_lines = f.readlines()
+def kwGetArr(pieces):
+    global vars, arrs
+    vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
 
-commands=["var","arr","app","getarr","setarr","string","out","goto","sleep","goif","math","end"]
-operators=["+","-","*","/","%"]
-comparators=["<<",">>","<=",">=", "==","!="]
-vars={}
-arrs={}
-bools = {}
-labels={}
-i=0
-interpreter = True
-brackets = 0
+def kwSetArr(pieces):
+    global arrs
+    arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
 
-#validate every line (breaks external libraries)
-if val:
-    for i in range(len(program_lines)):
-        lp=program_lines[i].replace(" ","").split(":")
-        if len(program_lines[i].replace(" ",""))>1:
-            if lp[0] in commands:
-                continue
-            elif lp[0].startswith("#"):
-                continue
-            else:
-                print(f"Error in line {i+1}: Command not found {lp[0]}")
-                exit()
-
-#resolve all lables
-i=0
-while i<len(program_lines):
-    line=program_lines[i]
-    if line[0].startswith=="#" or line=="\n":
-        i+=1
-        continue
-    line=line.split("#")[0]
-    if line.startswith("string"):
-        lstrip=line.replace("\n","")
+def kwOut(pieces):
+    global bools, logging, log
+    if pieces[1] in bools:
+        out = ["False","True"][int(bools[pieces[1]])]
     else:
-        lstrip=line.replace(" ","").replace("\t","").replace("\n","")
-    linepieces=lstrip.split(":")
+        out = get_value(pieces[1])
+    if not silent:
+        print(out)
+    if logging:
+        log.write(str(out)+"\n")
 
-    if linepieces[-1]=="label":# :name:label at the end of the line
-        labels[get_nonum(linepieces[-2])]=i
-    i+=1
-i=0
-
-def analyzeLine(line, linepieces):
-    try:
-        global i ,libs, vars, arrs, labels, interpreter, commands, operators, comparators, program_lines, brackets, silent, logging
-
-        if iscom("var", linepieces): # var : name = value
-            vars[get_nonum(linepieces[1]).split("=")[0].strip()]=get_value((linepieces[1]).split("=")[1])
-
-        elif iscom("arr", linepieces): # arr : name : size
-            arrs[get_nonum(linepieces[1])]=[0 for i in range(int(linepieces[2]))]
-
-        elif iscom("app", linepieces): # app : name : value
-            arrs[get_nonum(linepieces[1])].append(float(get_value(linepieces[2])))
-
-        elif iscom("getarr", linepieces): # getarr : name : index : destination
-            vars[str(linepieces[3])]=arrs[str(linepieces[1])][get_value(linepieces[2])]
-
-        elif iscom("setarr", linepieces): # setarr : name : index : value
-            arrs[str(linepieces[1])][get_value(linepieces[2])]=get_value(linepieces[3])
-
-        elif linepieces[0].strip()=="string": # DEPRECIATED, USE VAR INSTEAD
-            vars[str(linepieces[1]).split("=")[0].strip()]=str(linepieces[1]).split("=")[1]
-        #strings are weird
-
-        elif iscom("out", linepieces): #out : name
-            if linepieces[1] in bools:
-                out = ["False","True"][int(bools[linepieces[1]])]
-            else:
-                out = get_value(linepieces[1])
-            if not silent:
-                print(out)
-            if logging:
-                log.write(str(out)+"\n")
-
-        elif iscom("goto", linepieces): #goto : line
-            if linepieces[1] in labels:
-                i = labels[linepieces[1]]
-                return
-            try:
-                i = int(linepieces[1])-1
-            except:
-                print(f"Error in line {i + 1}: Label not found {linepieces[1]}")
-                exit()
-            return
-
-        elif iscom("sleep", linepieces):#sleep : time
-            time.sleep(float(linepieces[1]))
-
-        elif iscom("math", linepieces): #math : destination : value1 operator value2
-            lp=[]
-            for k in linepieces:
-                lp.append(k.replace(" ",""))
-            vardest=str(lp[1])
-            op=search_array(lp[2],operators)
-            var1=get_value(lp[2].split(op)[0])
-            var2=get_value(lp[2].split(op)[1])
-            a=0
-            if op=="+":
-                vars[vardest]=var1+var2
-            if op=="-":
-                vars[vardest]=var1-var2
-            if op=="*":
-                vars[vardest]=var1*var2
-            if op=="/":
-                vars[vardest]=var1/var2
-            if op=="%":
-                vars[vardest]=var1%var2
-
-        elif iscom("goif",linepieces): #goif : destination : var1  comparator  var2 (: or : var3 comparitor var4)
-            res = boolSolv(linepieces[2:])
-
-            if res==1:
-                if linepieces[1] in labels:
-                    i=labels[linepieces[1]]
-                    return
-                try:
-                    i=int(linepieces[1])-1
-                except:
-                    print(f"Error in line {i+1}: Label not found {linepieces[1]}")
-                    exit()
-                return
-
-        elif iscom("import", linepieces):
-            #imports a stoopid library which is essentially a python library specifically for the language
-            try:
-                a=__import__(str(linepieces[1])) #set the name of the library to after the path
-                libs.append(a)
-                #print(libs)
-            except:
-                print(f"Error in line {i+1}: Library not found {linepieces[1]}")
-                exit()
-
-        elif iscom("if", linepieces): # if : var1 comparator var2 : {
-            res = boolSolv(linepieces[1:])
-
-            if not res:
-                brackets=1
-                while not brackets==0:
-                    i+=1
-                    if "}" in program_lines[i]:
-                        brackets-=1
-                    if "{" in program_lines[i]:
-                        brackets+=1
-                    if brackets<0:
-                        print(f"Error in line {i+1}: Unmatched brackets")
-                        exit()
-
-                return
-
-        elif iscom("bool", linepieces):
-            name = get_nonum(linepieces[1]).split("=")[0].strip()
-            value = get_value(linepieces[1].split("=")[1])
-
-            if value == "True":
-                value = 1
-            elif value == "False":
-                value = 0
-            else:
-                value = boolSolv(get_nonum(linepieces[1]).split("=")[1:])
-
-            bools[name] = value
-
-        elif iscom("end", linepieces):
-            exit()
-        
-        else:
-            #check for any commands from the librarys
-            for lib in libs:
-                vars=lib.run(line,vars)
-        
-        i += 1
-
+def kwGoTo(pieces):
+    global labels, current_line
+    if pieces[1] in labels:
+        current_line = labels[pieces[1]] - 1
         return
-    except Exception as e:
-        print("Error at line "+str(i+1)+": "+str(e))
-        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
-        exit()
-
-
-# main loop
-while i < len(program_lines):
-
     try:
-        # get the line
-        line = program_lines[i]
-
-        linepieces = getline(line)
-        analyzeLine(line, linepieces)
-      
-    except Exception as e:
-        print("Critical error: " + str(e))
+        current_line = int(pieces[1]) - 2
+    except:
+        print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
         exit()
+
+def kwSleep(pieces):
+    time.sleep(float(pieces[1]))
+
+def kwMath(pieces):
+    global operators, vars
+    lp = []
+    for k in pieces:
+        lp.append(k.replace(" ", ""))
+    vardest = str(lp[1])
+    op = search_array(lp[2], operators)
+    var1 = get_value(lp[2].split(op)[0])
+    var2 = get_value(lp[2].split(op)[1])
+    if op == "+":
+        vars[vardest] = var1+var2
+    elif op == "-":
+        vars[vardest] = var1-var2
+    elif op == "*":
+        vars[vardest] = var1*var2
+    elif op == "/":
+        vars[vardest] = var1/var2
+    elif op == "%":
+        vars[vardest] = var1%var2
+
+def kwGoIf(pieces):
+    global current_line, labels
+    res = boolSolv(pieces[2:])
+
+    if res == 1:
+        if pieces[1] in labels:
+            current_line = labels[pieces[1]] - 1
+            return
+        try:
+            current_line = int(pieces[1]) - 2
+        except:
+            print(f"Error in line {current_line + 1}: Label not found {pieces[1]}")
+            exit()
+
+def kwIf(pieces):
+    global current_line
+    res = boolSolv(pieces[1:])
+
+    if not res:
+        brackets = 1
+        while not brackets == 0:
+            current_line += 1
+            if "}" in program_lines[current_line]:
+                brackets -= 1
+            if "{" in program_lines[current_line]:
+                brackets += 1
+            if brackets < 0:
+                print(f"Error in line {current_line + 1}: Unmatched brackets")
+                exit()
+
+def kwBool(pieces):
+    global bools
+    name = get_nonum(pieces[1], current_line).split("=")[0].strip()
+    value = get_value(pieces[1].split("=")[1])
+
+    if value == "True":
+        value = 1
+    elif value == "False":
+        value = 0
+    else:
+        value = boolSolv(get_nonum(pieces[1], current_line).split("=")[1:])
+
+    bools[name] = value
+
+def kwEnd(pieces):
+    exit()
+
+def NONE(pieces):
+    return
+
+################
+# dictionary for all keywords and their functions
+# add a keyword here
+# create a function for it called kw<Keyword>
+################
+keywords = {
+    'var' : kwVar,
+    'arr' : kwArr,
+    'app' : kwApp,
+    'getarr' : kwGetArr,
+    'setarr' : kwSetArr,
+    'out' : kwOut,
+    'goto' : kwGoTo,
+    'sleep' : kwSleep,
+    'math'  : kwMath,
+    'goif' : kwGoIf,
+    'if' : kwIf,
+    'bool' : kwBool,
+    'end' : kwEnd,
+    '}' : NONE,
+}
+
+# main loops
+
+## resolve all lables
+for i in range(len(program_lines)):
+    try:
+        line = program_lines[i]
+        if line[0].startswith == "#" or line == "\n":
+            continue
+        line = line.split("#")[0]
+        if line.startswith("string"):
+            lstrip = line.replace("\n","")
+        else:
+            lstrip = line.replace(" ","").replace("\t","").replace("\n","")
+        linepieces = lstrip.split(":")
+
+        if linepieces[-1] == "label":# :name:label at the end of the line
+            labels[get_nonum(linepieces[-2], i)] = i
+    except Exception as e:
+        print(f"Error in line {i + 1} while resolving labels:\n{str(e)}")
+        exit()
+
+## runs the code
+while current_line < len(program_lines):
+    # get the line
+    line = program_lines[current_line]
+
+    linepieces = getline(line)
+    
+    if linepieces[0] == "":
+        current_line += 1
+        continue
+    
+    # run the code
+    if linepieces[0] in keywords:
+        try:
+            keywords[linepieces[0]](linepieces)
+        except Exception as e:
+            print(f"Error in line {current_line + 1}:\n{str(e)}")
+            print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+            exit()
+    else:
+        print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
+        exit()
+    current_line += 1
