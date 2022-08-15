@@ -110,7 +110,10 @@ def get_value(inp):
             elif bools[inp] == 0:
                 return 0
         else:
-            return inp
+            try:
+                return solveMath(inp, vars)
+            except:
+                return inp
 
 ## returns a list of all pieces in the line
 def getline(line):
@@ -136,6 +139,16 @@ def convertToBool(var):
         return {"True":1, "False":0}[var]
     else:
         return var
+
+def solveMath(equasion, vars):
+    equasion = str(equasion)
+    for i in vars:
+        equasion = equasion.replace(i, str(vars[i]))
+    allowed = "0123456789*+-/()"
+    if (all(ch in allowed for ch in equasion)):
+        return eval(equasion)
+    else:
+        raise Exception("Invalid Equasion")
 
 ## checks bools and resolves them
 def boolSolv(pieces):
@@ -371,7 +384,7 @@ while current_line < len(program_lines):
     # run the code
     if linepieces[0] in keywords:
         try:
-            keywords[linepieces[0]](linepieces)
+            keywords[linepieces[0].lower()](linepieces)
         except Exception as e:
             print(f"Error in line {current_line + 1}:\n{str(e)}")
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
