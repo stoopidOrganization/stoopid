@@ -30,7 +30,7 @@
 Comments can be made with a # as the first character: `# this is a comment`
 Labels can be added after a line and you can jump to them with `goto` or `goif`: `: <name> : <label>`
 ##
-##### Compparators
+##### Comparators
 | Comparator | Example |
 | ---------- | ------- |
 | << | `1 << 2` |
