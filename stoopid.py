@@ -206,7 +206,7 @@ def solveMath(equasion):
     equasion = str(equasion)
     for i in vars:
         equasion = equasion.replace(i, str(vars[i]))
-    allowed = "0123456789*+-/()"
+    allowed = "0123456789*+-/()% "
     if (all(ch in allowed for ch in equasion)):
         return eval(equasion)
     else:
@@ -245,9 +245,9 @@ def boolSolv(pieces):
             if comp == -1:
                 if mop in bools:
                     results.append(get_value(mop))
-                elif mop == "True":
+                elif mop == "True" or mop == "1":
                     results.append(1)
-                elif mop == "False":
+                elif mop == "False" or mop == "0":
                     results.append(0)
                 else:
                     print(f"Error in line {current_line + 1}: Invalid data type or comparitor not found: {mop}")
@@ -290,7 +290,9 @@ def kwVar(pieces):
         pieces (String List): list of all pieces in the line
     """
     global vars, current_line
-    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
+
+    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value("".join((pieces[1]).split("=")[1:]))
+    # print(vars)
 
 def kwArr(pieces):
     """Adds an array to the list of arrays
@@ -368,21 +370,21 @@ def kwSleep(pieces):
     """
     time.sleep(float(pieces[1]))
 
-def kwMath(pieces):
-    """Resolves given equasion
+# def kwMath(pieces):
+#     global operators, vars
+#     lp = []
+#     for k in pieces:
+#         lp.append(k.replace(" ", ""))
+#     vardest = str(lp[1])
+#     op = search_array(lp[2], [o for o in operators])
+#     var1 = get_value(lp[2].split(op)[0])
+#     var2 = get_value(lp[2].split(op)[1])
+#     vars[vardest] = operators[op](var1, var2)
 
-    Args:
-        pieces (String List): list of all pieces in the line
-    """
-    global operators, vars
-    lp = []
-    for k in pieces:
-        lp.append(k.replace(" ", ""))
-    vardest = str(lp[1])
-    op = search_array(lp[2], [o for o in operators])
-    var1 = get_value(lp[2].split(op)[0])
-    var2 = get_value(lp[2].split(op)[1])
-    vars[vardest] = operators[op](var1, var2)
+def kwMath(pieces):
+    global vars
+    vars[str(pieces[1])] = get_value(pieces[2])
+
 
 def kwGoIf(pieces):
     """Sets the current line of the interpreter if given condition is true
