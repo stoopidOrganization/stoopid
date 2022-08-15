@@ -1,18 +1,16 @@
 # <img src="./images/stoopidlogomd.png" width="32" height="32">TOOPID
-
 ---
-
-Usage:
+##### Usage:
 - Python: `python stoopid.py <filename>`
 - Executable: `stoopid.exe <filename>`
-
-Aditional Parameters
+##
+##### Aditional Parameters
 | Parameter | Description |
 | --------- | ----------- |
 | --log \<filename\> | file to write the logs to |
 | --silent | disables all output |
-
-Commands
+##
+##### Commands
 | Keyword | Syntax | Description |
 | ------- | ------ | ----------- |
 | var | `var : <name> = <value>` | Creates a variable |
@@ -27,3 +25,5 @@ Commands
 | if | `if : <condition> : {` | Executes code in curly brackets if the condition is true |
 | bool | `bool : <name> = <value>` | Creates a boolean |
 | end | `end` | Stops code |
+
+
