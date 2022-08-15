@@ -65,18 +65,31 @@ labels = {}
 current_line = 0
 
 # helper functions
-## tests if the given input is a number
 def isnumber(string):
+    """Test if given string is a number
+
+    Args:
+        string (string): input string
+
+    Returns:
+        boolean: if given string is number
+    """
     try:
         float(string)
         return True
     except ValueError:
         return False
 
-## checks if the given number is a float
 def is_float(number):
+    """Test if given number is a float
+
+    Args:
+        number : number to test
+
+    Returns:
+        boolean: if number is a float
+    """
     try:
-    # check if the number could be represented as an int
         if float(number) == int(number):
             return False
         else:
@@ -84,15 +97,30 @@ def is_float(number):
     except ValueError:
         return False
 
-## tests if the given input is not a number
-def get_nonum(num, lineNum):
-    global current_line
-    if isnumber(num):
-        print(f"Error in line {lineNum + 1}: String expected, but got number: {num}")
-    return num
+def get_nonum(inp, lineNum):
+    """Test if given input is not a number
 
-## gets the current value of any variable
+    Args:
+        inp : input string
+        lineNum (int): current line
+
+    Returns:
+        string: input as not a number
+    """
+    global current_line
+    if isnumber(inp):
+        print(f"Error in line {lineNum + 1}: String expected, but got number: {inp}")
+    return inp
+
 def get_value(inp):
+    """Gets current value of any variable
+
+    Args:
+        inp (string): variable name
+
+    Returns:
+        any: value of given variable
+    """
     global vars, bools
     inp=str(inp).strip()
 
@@ -111,12 +139,19 @@ def get_value(inp):
                 return 0
         else:
             try:
-                return solveMath(inp, vars)
+                return solveMath(inp)
             except:
                 return inp
 
-## returns a list of all pieces in the line
 def getline(line):
+    """returns a list of all pieces in the line
+
+    Args:
+        line (string): the full line to be split 
+
+    Returns:
+        string list: list of all pieces in a line
+    """
     line.strip()
     if line == "" or line.startswith("'"):
         return ""
@@ -126,21 +161,48 @@ def getline(line):
         linepieces[k] = linepieces[k].strip()
     return linepieces
 
-## idk why this is here
 def search_array(string, array):
+    """tests if an element in an array is in the string
+
+    Args:
+        string (string): string which should include something
+        array (string array): list of values which the string could include
+
+    Returns:
+        string or int: value which is included in the string or -1
+    """
     for k in range(len(array)):
         if array[k] in string:
             return array[k]
     return -1
 
-## converts "booleans" to booleans
-def convertToBool(var):
-    if var == "True" or var == "False":
-        return {"True":1, "False":0}[var]
-    else:
-        return var
+def convertToBool(val):
+    """Converts booleans as string to real booleans
 
-def solveMath(equasion, vars):
+    Args:
+        val (string): Value to convert to boolean
+
+    Returns:
+        string or bool: the boolean which was given or if it isnt a boolean it just returns the value
+    """
+    if val == "True" or val == "False":
+        return {"True":1, "False":0}[val]
+    else:
+        return val
+
+def solveMath(equasion):
+    """Solves an equasion
+
+    Args:
+        equasion (string): equasion to solve
+
+    Raises:
+        Exception: Invalid Equasion
+
+    Returns:
+        string: solved equasion
+    """
+    global vars
     equasion = str(equasion)
     for i in vars:
         equasion = equasion.replace(i, str(vars[i]))
@@ -150,8 +212,15 @@ def solveMath(equasion, vars):
     else:
         raise Exception("Invalid Equasion")
 
-## checks bools and resolves them
 def boolSolv(pieces):
+    """checks bools and resolves them
+
+    Args:
+        pieces (string array): Pieces of current lines
+
+    Returns:
+        boolean: returns the solved condition
+    """
     global current_line, comparators
     try:
         # get clean linepieces
@@ -214,29 +283,59 @@ def boolSolv(pieces):
         exit()
 # keyword functions
 
-## function for out keyword
 def kwVar(pieces):
+    """Adds a variable to the list of variables
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global vars, current_line
+
     vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value("".join((pieces[1]).split("=")[1:]))
     # print(vars)
 
 def kwArr(pieces):
+    """Adds an array to the list of arrays
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global arrs
     arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 def kwApp(pieces):
+    """Appends to an array
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global arrs
     arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
 
 def kwGetArr(pieces):
+    """Gets the value of an item in an array at a specific index
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global vars, arrs
     vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
 
 def kwSetArr(pieces):
+    """Sets the value of a specific item in an array
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global arrs
     arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
 
 def kwOut(pieces):
+    """Prints the given input
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global bools, logging, log
     if pieces[1] in bools:
         out = ["False","True"][int(bools[pieces[1]])]
@@ -248,6 +347,11 @@ def kwOut(pieces):
         log.write(str(out)+"\n")
 
 def kwGoTo(pieces):
+    """Sets the current line of the interpreter
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global labels, current_line
     if pieces[1] in labels:
         current_line = labels[pieces[1]] - 1
@@ -259,6 +363,11 @@ def kwGoTo(pieces):
         exit()
 
 def kwSleep(pieces):
+    """Sleeps the given time
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     time.sleep(float(pieces[1]))
 
 # def kwMath(pieces):
@@ -276,7 +385,13 @@ def kwMath(pieces):
     global vars
     vars[str(pieces[1])] = get_value(pieces[2])
 
+
 def kwGoIf(pieces):
+    """Sets the current line of the interpreter if given condition is true
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global current_line, labels
     res = boolSolv(pieces[2:])
 
@@ -291,6 +406,11 @@ def kwGoIf(pieces):
             exit()
 
 def kwIf(pieces):
+    """Executes codeblock in curly brackets if condition is true
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global current_line
     res = boolSolv(pieces[1:])
 
@@ -307,6 +427,11 @@ def kwIf(pieces):
                 exit()
 
 def kwBool(pieces):
+    """Creates a boolean
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global bools
     name = get_nonum(pieces[1], current_line).split("=")[0].strip()
     value = get_value(pieces[1].split("=")[1])
@@ -321,9 +446,19 @@ def kwBool(pieces):
     bools[name] = value
 
 def kwEnd(pieces):
+    """Ends the programm
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     exit()
 
 def NONE(pieces):
+    """Placeholder for keywords that do nothing
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     return
 
 ################
