@@ -203,11 +203,21 @@ def boolSolv(pieces):
 
 ## function for out keyword
 def kwVar(pieces):
+    """Adds a variable to the list of variables
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global vars, current_line
     vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
     # print(vars)
 
 def kwArr(pieces):
+    """Adds an array to the list of arrays
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global arrs
     arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
