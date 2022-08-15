@@ -349,15 +349,7 @@ keywords = {
 ## resolve all lables
 for i in range(len(program_lines)):
     try:
-        line = program_lines[i]
-        if line[0].startswith == "#" or line == "\n":
-            continue
-        line = line.split("#")[0]
-        if line.startswith("string"):
-            lstrip = line.replace("\n","")
-        else:
-            lstrip = line.replace(" ","").replace("\t","").replace("\n","")
-        linepieces = lstrip.split(":")
+        linepieces = getline(program_lines[i])
 
         if linepieces[-1] == "label":# :name:label at the end of the line
             labels[get_nonum(linepieces[-2], i)] = i
@@ -368,9 +360,7 @@ for i in range(len(program_lines)):
 ## runs the code
 while current_line < len(program_lines):
     # get the line
-    line = program_lines[current_line]
-
-    linepieces = getline(line)
+    linepieces = getline(program_lines[current_line])
     
     if linepieces[0] == "":
         current_line += 1
