@@ -143,7 +143,6 @@ def convertToBool(var):
 def solveMath(equasion, vars):
     equasion = str(equasion)
     for i in vars:
-        print(i)
         equasion = equasion.replace(i, str(vars[i]))
     allowed = "=0123456789*+-/()"
     if (all(ch in allowed for ch in equasion)):
