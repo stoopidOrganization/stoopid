@@ -176,9 +176,9 @@ def boolSolv(pieces):
             if comp == -1:
                 if mop in bools:
                     results.append(get_value(mop))
-                elif mop == "True":
+                elif mop == "True" or mop == "1":
                     results.append(1)
-                elif mop == "False":
+                elif mop == "False" or mop == "0":
                     results.append(0)
                 else:
                     print(f"Error in line {current_line + 1}: Invalid data type or comparitor not found: {mop}")
@@ -217,7 +217,7 @@ def boolSolv(pieces):
 ## function for out keyword
 def kwVar(pieces):
     global vars, current_line
-    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value((pieces[1]).split("=")[1])
+    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value("".join((pieces[1]).split("=")[1:]))
     # print(vars)
 
 def kwArr(pieces):
@@ -275,6 +275,7 @@ def kwSleep(pieces):
 def kwMath(pieces):
     global vars
     vars[str(pieces[1])] = get_value(pieces[2])
+
 def kwGoIf(pieces):
     global current_line, labels
     res = boolSolv(pieces[2:])
