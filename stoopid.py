@@ -144,7 +144,7 @@ def solveMath(equasion, vars):
     equasion = str(equasion)
     for i in vars:
         equasion = equasion.replace(i, str(vars[i]))
-    allowed = "0123456789*+-/()"
+    allowed = "0123456789*+-/()% "
     if (all(ch in allowed for ch in equasion)):
         return eval(equasion)
     else:
@@ -261,17 +261,20 @@ def kwGoTo(pieces):
 def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
-def kwMath(pieces):
-    global operators, vars
-    lp = []
-    for k in pieces:
-        lp.append(k.replace(" ", ""))
-    vardest = str(lp[1])
-    op = search_array(lp[2], [o for o in operators])
-    var1 = get_value(lp[2].split(op)[0])
-    var2 = get_value(lp[2].split(op)[1])
-    vars[vardest] = operators[op](var1, var2)
+# def kwMath(pieces):
+#     global operators, vars
+#     lp = []
+#     for k in pieces:
+#         lp.append(k.replace(" ", ""))
+#     vardest = str(lp[1])
+#     op = search_array(lp[2], [o for o in operators])
+#     var1 = get_value(lp[2].split(op)[0])
+#     var2 = get_value(lp[2].split(op)[1])
+#     vars[vardest] = operators[op](var1, var2)
 
+def kwMath(pieces):
+    global vars
+    vars[str(pieces[1])] = get_value(pieces[2])
 def kwGoIf(pieces):
     global current_line, labels
     res = boolSolv(pieces[2:])
