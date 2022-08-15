@@ -48,7 +48,7 @@ wthe comparitors are
 
 the operators are
 
-+ ,-, *, /, %
+"+ ,-, *, /, %"
 
 I should note that the syntax is strict, and can only be written as in the example
 

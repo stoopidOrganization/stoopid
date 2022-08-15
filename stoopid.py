@@ -222,6 +222,11 @@ def kwArr(pieces):
     arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 def kwApp(pieces):
+    """Appends to an array
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
     global arrs
     arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
 
