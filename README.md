@@ -25,5 +25,27 @@
 | if | `if : <condition> : {` | Executes code in curly brackets if the condition is true |
 | bool | `bool : <name> = <value>` | Creates a boolean |
 | end | `end` | Stops code |
+##
+##### Other useful features
+Comments can be made with a # as the first character: `# this is a comment`
+Labels can be added after a line and you can jump to them with `goto` or `goif`: `: <name> : <label>`
+##
+##### Compparators
+| Comparator | Example |
+| ---------- | ------- |
+| << | `1 << 2` |
+| >> | `2 >> 1` |
+| == | `2 == 2` |
+| != | `2 != 1` |
+| <= | `1 <= 2` or `1 <= 1` |
+| >= | `2 >= 1` or `2 >= 2` |
 
-
+##
+##### Operators
+| Operators | Example |
+| ---------- | ------- |
+| + | `1 + 2 = 3` |
+| - | `3 - 2 = 1` |
+| * | `3 * 2 = 6` |
+| / | `3 / 2 = 1.5` |
+| % | `3 % 2 = 1` |
