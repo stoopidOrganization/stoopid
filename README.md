@@ -15,7 +15,7 @@
 | ------- | ------ | ----------- |
 | var | `var : <name> = <value>` | Creates a variable |
 | arr | `arr : <name> : <size>` | Creates an array |
-| app | `app : <name> : value` | Appends to an array |
+| app | `app : <name> : <value>` | Appends to an array |
 | getarr | `getarr : <name> : <index> : <destination>` | Gets the value of an array at index |
 | out | `out : <name>` | Prints the given value |
 | goto | `goto : <line>` | Changes the next line read by the interpreter |
@@ -28,7 +28,7 @@
 ##
 ##### Other useful features
 Comments can be made with a # as the first character: `# this is a comment`
-Labels can be added after a line and you can jump to them with `goto` or `goif`: `: <name> : <label>`
+Labels can be added after a line and you can jump to them with `goto` or `goif`: `: <label>`
 ##
 ##### Comparators
 | Comparator | Example |
