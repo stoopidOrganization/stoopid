@@ -1,4 +1,5 @@
-import time, sys, json, os
+from re import sub
+import time, sys, json, os, subprocess
 from sys import exit
 
 # get the system arguments
@@ -292,6 +293,7 @@ def boolSolv(pieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+
 def getPath(path):
     """resolves the given path
 
@@ -313,11 +315,20 @@ def getPath(path):
         while p < len(pathlist):
             fetchedPath = os.path.join(fetchedPath, pathlist[p])
             p += 1
+        subprocess.run(
+            f"mkdir {fetchedPath}",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=True,
+        )
 
         return fetchedPath
     except Exception as e:
-        print(f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}")
+        print(
+            f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}"
+        )
         exit()
+
 
 # keyword functions
 
@@ -485,13 +496,37 @@ def kwBool(pieces):
 
     bools[name] = value
 
+
 def kwImport(pieces):
-    with open("config.json", "r") as f:
-        config = json.load(f)
-        newPath = getPath(config["path"])
-            
-        print(newPath)
-        
+    """Imports a library
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
+    try:
+        lib = pieces[1]
+
+        with open("config.json", "r") as f:
+            config = json.load(f)
+
+        path = os.path.join(getPath(config["path"]), "libs")
+
+        subprocess.run(
+            f"mkdir {path}",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=True,
+        )
+
+        if not path in sys.path:
+            sys.path.append(path)
+
+        imp = __import__(lib)
+    except Exception as e:
+        print(f"Error in line {current_line + 1}: Library {lib} not found")
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        exit()
+
 
 def kwEnd(pieces):
     """Ends the programm
