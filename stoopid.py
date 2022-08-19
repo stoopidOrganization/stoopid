@@ -215,7 +215,8 @@ def solveMath(equasion):
         equasion = equasion.replace(i, str(vars[i]))
     allowed = "0123456789*+-/()% "
     if all(ch in allowed for ch in equasion):
-        return eval(equasion)
+        # return eval(equasion)
+        pass
     else:
         raise Exception("Invalid Equasion")
 
@@ -492,7 +493,7 @@ keywords = {
     "out": kwOut,
     "goto": kwGoTo,
     "sleep": kwSleep,
-    "math": kwMath,
+    # "math": kwMath,
     "goif": kwGoIf,
     "if": kwIf,
     "bool": kwBool,
