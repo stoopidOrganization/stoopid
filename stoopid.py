@@ -293,6 +293,14 @@ def boolSolv(pieces):
         exit()
 
 def getPath(path):
+    """resolves the given path
+
+    Args:
+        path (string): path as string
+
+    Returns:
+        string: resolved path
+    """
     try:
         pathlist = path.replace("%", "").split("\\")
 
