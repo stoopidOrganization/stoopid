@@ -393,18 +393,6 @@ def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
 
-# def kwMath(pieces):
-#     global operators, vars
-#     lp = []
-#     for k in pieces:
-#         lp.append(k.replace(" ", ""))
-#     vardest = str(lp[1])
-#     op = search_array(lp[2], [o for o in operators])
-#     var1 = get_value(lp[2].split(op)[0])
-#     var2 = get_value(lp[2].split(op)[1])
-#     vars[vardest] = operators[op](var1, var2)
-
-
 def kwMath(pieces):
     global vars
     vars[str(pieces[1])] = get_value(pieces[2])
