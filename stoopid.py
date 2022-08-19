@@ -523,7 +523,7 @@ def kwImport(pieces):
     try:
         lib = pieces[1]
 
-        with open("config.json", "r") as f:
+        with open(str(resource_path("config.json")), "r") as f:
             config = json.load(f)
 
         path = os.path.join(getPath(config["path"]), "libs")
