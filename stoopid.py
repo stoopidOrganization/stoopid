@@ -1,4 +1,3 @@
-from re import sub
 import time, sys, json, os, subprocess
 from sys import exit
 
@@ -587,6 +586,13 @@ keywords = {
     "end": kwEnd,
     "}": NONE,
 }
+
+# config
+if sys.argv[1] == "--path":
+    with open(str(resource_path("config.json")), "wr") as f:
+        config = json.load(f)
+        config["path"] = sys.argv[2]
+        f.write(config)
 
 # main loops
 
