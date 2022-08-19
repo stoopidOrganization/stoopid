@@ -328,6 +328,23 @@ def getPath(path):
             f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}"
         )
         exit()
+        
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller
+
+    Args:
+        relative_path (string): relative path to the resource
+
+    Returns:
+        string: path to the resource
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
 
 
 # keyword functions
@@ -522,6 +539,7 @@ def kwImport(pieces):
             sys.path.append(path)
 
         imp = __import__(lib)
+        imp.main()
     except Exception as e:
         print(f"Error in line {current_line + 1}: Library {lib} not found")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
