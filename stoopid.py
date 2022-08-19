@@ -215,8 +215,8 @@ def solveMath(equasion):
         equasion = equasion.replace(i, str(vars[i]))
     allowed = "0123456789*+-/()% "
     if all(ch in allowed for ch in equasion):
-        # return eval(equasion)
-        pass
+        # TODO implement math again
+        return 0
     else:
         raise Exception("Invalid Equasion")
 
