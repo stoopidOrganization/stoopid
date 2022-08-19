@@ -1,4 +1,4 @@
-import time, sys, pathlib
+import time, sys, json, os
 from sys import exit
 
 # get the system arguments
@@ -292,6 +292,24 @@ def boolSolv(pieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+def getPath(path):
+    try:
+        pathlist = path.replace("%", "").split("\\")
+
+        for p in range(len(pathlist)):
+            if os.getenv(pathlist[p]) != None:
+                pathlist[p] = os.getenv(pathlist[p])
+
+        fetchedPath = os.path.join(pathlist[0])
+        p = 1
+        while p < len(pathlist):
+            fetchedPath = os.path.join(fetchedPath, pathlist[p])
+            p += 1
+
+        return fetchedPath
+    except Exception as e:
+        print(f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}")
+        exit()
 
 # keyword functions
 
@@ -460,8 +478,12 @@ def kwBool(pieces):
     bools[name] = value
 
 def kwImport(pieces):
-    path = pathlib.Path(__file__).parent.resolve()
-    print(path)
+    with open("config.json", "r") as f:
+        config = json.load(f)
+        newPath = getPath(config["path"])
+            
+        print(newPath)
+        
 
 def kwEnd(pieces):
     """Ends the programm
