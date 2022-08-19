@@ -459,6 +459,8 @@ def kwBool(pieces):
 
     bools[name] = value
 
+def kwImport(pieces):
+    pass
 
 def kwEnd(pieces):
     """Ends the programm
@@ -496,6 +498,7 @@ keywords = {
     "goif": kwGoIf,
     "if": kwIf,
     "bool": kwBool,
+    "import": kwImport,
     "end": kwEnd,
     "}": NONE,
 }
