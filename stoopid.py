@@ -1,4 +1,4 @@
-import time, sys
+import time, sys, pathlib
 from sys import exit
 
 # get the system arguments
@@ -460,7 +460,8 @@ def kwBool(pieces):
     bools[name] = value
 
 def kwImport(pieces):
-    pass
+    path = pathlib.Path(__file__).parent.resolve()
+    print(path)
 
 def kwEnd(pieces):
     """Ends the programm
