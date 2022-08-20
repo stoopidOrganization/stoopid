@@ -293,7 +293,8 @@ def getPath(path):
             f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}"
         )
         exit()
-        
+
+
 def resource_path(relative_path):
     """Get absolute path to resource, works for dev and for PyInstaller
 
@@ -531,6 +532,13 @@ def NONE(pieces):
 
 # get the system arguments
 
+# config
+if sys.argv[1] == "--path":
+    with open(str(resource_path("config.json")), "wr") as f:
+        config = json.load(f)
+        config["path"] = sys.argv[2]
+        f.write(config)
+
 ## get the filename
 ## always the first argument
 overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
@@ -586,13 +594,6 @@ keywords = {
     "end": kwEnd,
     "}": NONE,
 }
-
-# config
-if sys.argv[1] == "--path":
-    with open(str(resource_path("config.json")), "wr") as f:
-        config = json.load(f)
-        config["path"] = sys.argv[2]
-        f.write(config)
 
 # main loops
 
