@@ -534,11 +534,15 @@ def NONE(pieces):
 
 # config
 if sys.argv[1] == "--path":
-    with open(str(resource_path("config.json")), "wr") as f:
+    with open(str(resource_path("config.json")), "r") as f:
         config = json.load(f)
-        config["path"] = sys.argv[2]
-        f.write(config)
+        print(config)
 
+    with open(str(resource_path("config.json")), "w") as f:
+        config["path"] = sys.argv[2]
+        f.write(json.dumps(config))
+
+    exit()
 ## get the filename
 ## always the first argument
 overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
