@@ -168,6 +168,7 @@ def convertToBool(val):
 def solvemath(equasion):
     try:
         global operators, vars, orderOfOps, current_line
+        equasion = equasion.replace(" ", "")
         if "(" in equasion:
             for k in range(len(equasion)):
                 if equasion[k] == "(":
@@ -526,11 +527,6 @@ def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
 
-def kwMath(pieces):
-    global vars
-    vars[str(pieces[1])] = get_value(pieces[2])
-
-
 def kwGoIf(pieces):
     """Sets the current line of the interpreter if given condition is true
 
@@ -698,7 +694,6 @@ keywords = {
     "out": kwOut,
     "goto": kwGoTo,
     "sleep": kwSleep,
-    # "math": kwMath,
     "goif": kwGoIf,
     "if": kwIf,
     "bool": kwBool,

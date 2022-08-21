@@ -22,5 +22,5 @@ if : test2 : {
     out : it-doesnt-work
 }
 
-math : c : a + b
+var : c = a + b
 out : c
