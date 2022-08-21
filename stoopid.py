@@ -489,10 +489,7 @@ def kwImport(pieces):
     try:
         lib = pieces[1]
 
-        with open(str(resource_path("config.json")), "r") as f:
-            config = json.load(f)
-
-        path = os.path.join(getPath(config["path"]), "libs")
+        path = os.path.join(getPath("%appdata%\\stoopid"), "libs")
 
         subprocess.run(
             f"mkdir {path}",
@@ -533,16 +530,8 @@ def NONE(pieces):
 # get the system arguments
 
 # config
-if sys.argv[1] == "--path":
-    with open(str(resource_path("config.json")), "r") as f:
-        config = json.load(f)
-        print(config)
+## no config
 
-    with open(str(resource_path("config.json")), "w") as f:
-        config["path"] = sys.argv[2]
-        f.write(json.dumps(config))
-
-    exit()
 ## get the filename
 ## always the first argument
 overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
