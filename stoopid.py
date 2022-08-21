@@ -1,8 +1,9 @@
-import time, sys
+import time, sys, os, subprocess
 from sys import exit
 
 # initialize some default variables
-
+configPath = "%appdata%\\stoopid"
+libs = {}
 ## list of all the default usable operators and comparators
 operators = {
     "+": lambda x, y: x + y,
@@ -357,6 +358,60 @@ def boolSolv(pieces):
         exit()
 
 
+def getPath(path):
+    """resolves the given path
+
+    Args:
+        path (string): path as string
+
+    Returns:
+        string: resolved path
+    """
+    try:
+        pathlist = path.replace("%", "").split("\\")
+
+        for p in range(len(pathlist)):
+            if os.getenv(pathlist[p]) != None:
+                pathlist[p] = os.getenv(pathlist[p])
+
+        fetchedPath = os.path.join(pathlist[0])
+        p = 1
+        while p < len(pathlist):
+            fetchedPath = os.path.join(fetchedPath, pathlist[p])
+            p += 1
+        subprocess.run(
+            f"mkdir {fetchedPath}",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=True,
+        )
+
+        return fetchedPath
+    except Exception as e:
+        print(
+            f"Interpreter Error: {e}\nCould not resolve Path {path}\nCrashed in line {e.__traceback__.tb_lineno}"
+        )
+        exit()
+
+
+def resource_path(relative_path):
+    """Get absolute path to resource, works for dev and for PyInstaller
+
+    Args:
+        relative_path (string): relative path to the resource
+
+    Returns:
+        string: path to the resource
+    """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, relative_path)
+
+
 # keyword functions
 
 
@@ -524,6 +579,41 @@ def kwBool(pieces):
     bools[name] = value
 
 
+def kwImport(pieces):
+    """Imports a library
+
+    Args:
+        pieces (String List): list of all pieces in the line
+    """
+    global libs, keywords, configPath
+    try:
+        lib = pieces[1]
+
+        path = os.path.join(getPath(configPath), "libs")
+
+        subprocess.run(
+            f"mkdir {path}",
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+            shell=True,
+        )
+
+        if not path in sys.path:
+            sys.path.append(path)
+
+        imp = __import__(lib)
+        if lib not in libs:
+            libs[lib] = imp
+            libkws = imp.main()
+
+            for l in libkws:
+                keywords[l] = libkws[l]
+    except Exception as e:
+        print(f"Error in line {current_line + 1}: Library {lib} not found")
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        exit()
+
+
 def kwEnd(pieces):
     """Ends the programm
 
@@ -543,6 +633,9 @@ def NONE(pieces):
 
 
 # get the system arguments
+
+# config
+## no config
 
 ## get the filename
 ## always the first argument
@@ -595,6 +688,7 @@ keywords = {
     "goif": kwGoIf,
     "if": kwIf,
     "bool": kwBool,
+    "import": kwImport,
     "end": kwEnd,
     "}": NONE,
 }
