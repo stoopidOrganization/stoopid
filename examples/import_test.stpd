@@ -1,6 +1,2 @@
 import : testlib
-import : testlib
-import : testlib
-import : testlib
-import : testlib
-import : testlib
+test : hello world

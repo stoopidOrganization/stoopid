@@ -1,8 +1,9 @@
-import time, sys, json, os, subprocess
+import time, sys, os, subprocess
 from sys import exit
 
 # initialize some default variables
-
+configPath = "%appdata%\\stoopid"
+libs = {}
 ## list of all the default usable operators and comparators
 operators = {
     "+": lambda x, y: x + y,
@@ -486,10 +487,11 @@ def kwImport(pieces):
     Args:
         pieces (String List): list of all pieces in the line
     """
+    global libs, keywords, configPath
     try:
         lib = pieces[1]
 
-        path = os.path.join(getPath("%appdata%\\stoopid"), "libs")
+        path = os.path.join(getPath(configPath), "libs")
 
         subprocess.run(
             f"mkdir {path}",
@@ -502,7 +504,12 @@ def kwImport(pieces):
             sys.path.append(path)
 
         imp = __import__(lib)
-        imp.main()
+        if lib not in libs:
+            libs[lib] = imp
+            libkws = imp.main()
+
+            for l in libkws:
+                keywords[l] = libkws[l]
     except Exception as e:
         print(f"Error in line {current_line + 1}: Library {lib} not found")
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
