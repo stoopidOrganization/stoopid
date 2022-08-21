@@ -248,7 +248,7 @@ def solvemath(equasion):
             # print(equasion)
             # print("bigg recursion!")
             return getAsNumtype((solvemath(equasion)))
-            
+
         elif len(ops) == 1:
             # print("sussywussy")
             return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
@@ -256,9 +256,9 @@ def solvemath(equasion):
             return getAsNumtype(values[0])
     except Exception as e:
         raise e
-        #print(f"Error in line {current_line + 1}: Math error, {e}")
-        #print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
-        #exit()
+        # print(f"Error in line {current_line + 1}: Math error, {e}")
+        # print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        # exit()
 
 
 def findNextBracket(string, start):
@@ -361,6 +361,7 @@ def boolSolv(pieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+
 def getAsNumtype(num):
     try:
         if is_float(num):
@@ -369,6 +370,7 @@ def getAsNumtype(num):
             return int(num)
     except:
         raise Exception("Invalid data type")
+
 
 def getPath(path):
     """resolves the given path
