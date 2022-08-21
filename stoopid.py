@@ -168,6 +168,7 @@ def convertToBool(val):
 def solvemath(equasion):
     try:
         global operators, vars, orderOfOps, current_line
+        equasion = equasion.replace(" ", "")
         if "(" in equasion:
             for k in range(len(equasion)):
                 if equasion[k] == "(":
@@ -248,7 +249,7 @@ def solvemath(equasion):
             # print(equasion)
             # print("bigg recursion!")
             return getAsNumtype((solvemath(equasion)))
-            
+
         elif len(ops) == 1:
             # print("sussywussy")
             return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
@@ -256,9 +257,9 @@ def solvemath(equasion):
             return getAsNumtype(values[0])
     except Exception as e:
         raise e
-        #print(f"Error in line {current_line + 1}: Math error, {e}")
-        #print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
-        #exit()
+        # print(f"Error in line {current_line + 1}: Math error, {e}")
+        # print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        # exit()
 
 
 def findNextBracket(string, start):
@@ -361,6 +362,7 @@ def boolSolv(pieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+
 def getAsNumtype(num):
     try:
         if is_float(num):
@@ -369,6 +371,7 @@ def getAsNumtype(num):
             return int(num)
     except:
         raise Exception("Invalid data type")
+
 
 def getPath(path):
     """resolves the given path
@@ -522,11 +525,6 @@ def kwSleep(pieces):
         pieces (String List): list of all pieces in the line
     """
     time.sleep(float(pieces[1]))
-
-
-def kwMath(pieces):
-    global vars
-    vars[str(pieces[1])] = get_value(pieces[2])
 
 
 def kwGoIf(pieces):
@@ -696,7 +694,6 @@ keywords = {
     "out": kwOut,
     "goto": kwGoTo,
     "sleep": kwSleep,
-    # "math": kwMath,
     "goif": kwGoIf,
     "if": kwIf,
     "bool": kwBool,
