@@ -247,16 +247,18 @@ def solvemath(equasion):
             # print(equasion)
             # print(equasion)
             # print("bigg recursion!")
-            return float(solvemath(equasion))
+            return getAsNumtype((solvemath(equasion)))
+            
         elif len(ops) == 1:
             # print("sussywussy")
-            return float(operators[ops[0]](float(values[0]), float(values[1])))
+            return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
         else:
-            return values[0]
+            return getAsNumtype(values[0])
     except Exception as e:
-        print(f"Error in line {current_line + 1}: Math error, {e}")
-        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
-        exit()
+        raise e
+        #print(f"Error in line {current_line + 1}: Math error, {e}")
+        #print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        #exit()
 
 
 def findNextBracket(string, start):
@@ -316,11 +318,13 @@ def boolSolv(pieces):
 
             comp = search_array(mop, [c for c in comparators])
             if comp == -1:
+                if mop in vars:
+                    mop = vars[mop]
                 if mop in bools:
                     results.append(get_value(mop))
-                elif mop == "True" or mop == "1":
+                elif mop.lower() == "true" or mop == "1":
                     results.append(1)
-                elif mop == "False" or mop == "0":
+                elif mop.lower() == "false" or mop == "0":
                     results.append(0)
                 else:
                     print(
@@ -357,6 +361,14 @@ def boolSolv(pieces):
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
+def getAsNumtype(num):
+    try:
+        if is_float(num):
+            return float(num)
+        else:
+            return int(num)
+    except:
+        raise Exception("Invalid data type")
 
 def getPath(path):
     """resolves the given path
