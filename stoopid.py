@@ -10,6 +10,7 @@ operators = {
     "*": lambda x, y: x * y,
     "/": lambda x, y: x / y,
     "%": lambda x, y: x % y,
+    "^": lambda x, y: x**y,
 }
 comparators = {
     "<<": lambda x, y: x < y,
@@ -19,6 +20,7 @@ comparators = {
     "==": lambda x, y: x == y,
     "!=": lambda x, y: x != y,
 }
+orderOfOps = [["+", "-"], ["*", "/"], ["%", "^"]]
 
 ## saves all used variables
 vars = {}
@@ -107,7 +109,7 @@ def get_value(inp):
                 return 0
         else:
             try:
-                return solveMath(inp)
+                return solvemath(inp)
             except:
                 return inp
 
@@ -162,28 +164,124 @@ def convertToBool(val):
         return val
 
 
-def solveMath(equasion):
-    """Solves an equasion
+def solvemath(equasion):
+    try:
+        global operators, vars, orderOfOps, current_line
+        if "(" in equasion:
+            for k in range(len(equasion)):
+                if equasion[k] == "(":
+                    start = k
+
+                    break
+            for k in range(len(equasion) - 1, 0, -1):
+                if equasion[k] == ")":
+                    stop = k
+
+                    break
+            tmpequasion = equasion[:start]
+            tmpequasion += str(int(solvemath(equasion[start + 1 : stop])))
+            tmpequasion += equasion[stop + 1 :]
+            return solvemath(tmpequasion)
+        equasion = str(equasion)
+        for i in vars:
+            equasion = equasion.replace(i, str(vars[i]))
+        ops = []
+        values = []
+
+        x = 0
+        while x < len(equasion):
+            if isnumber(equasion[x]):
+                if x > 0 and (
+                    isnumber(equasion[x - 1])
+                    or values[len(values) - 1][len(values[len(values) - 1]) - 1]
+                    in ["-", "."]
+                ):
+                    values[len(values) - 1] += equasion[x]
+                else:
+                    values.append(str(equasion[x]))
+            elif equasion[x] in [o for o in operators]:
+                if (x == 0 and equasion[x] == "-") or (
+                    x > 0 and not isnumber(equasion[x - 1])
+                ):
+                    values.append(equasion[x])
+                else:
+                    ops.append(str(equasion[x]))
+            elif equasion[x] == ".":
+                if x > 0 and isnumber(equasion[x - 1]):
+                    values[len(values) - 1] += "."
+                else:
+                    values.append("0.")
+            x += 1
+
+        # print(str(ops) + "\n" + str(values))
+        # now we have the values and the operators, find the order in which they should be solved
+        order = []
+        for i in range(len(ops)):
+            for k in range(len(orderOfOps)):
+                if ops[i] in orderOfOps[k]:
+                    order.append(k)
+
+        # print(order)
+
+        # now we have the order in which the operators should be solved, we need to solve them
+        minorder = max(order)
+        for i in range(len(ops)):
+            if order[i] == minorder:
+                values[i] = float(
+                    operators[ops[i]](float(values[i]), float(values[i + 1]))
+                )
+                values.pop(i + 1)
+                ops.pop(i)
+
+                order.pop(i)
+                break
+        # print(f"{values} uwu {ops} owo")
+        # after we have solved the first operator, we need to solve the rest
+        if len(ops) > 1:
+            # recreate the equation
+            equasion = ""
+            for i in range(len(ops)):
+                equasion += str(values[i]) + str((ops[i]))
+            equasion += str(values[-1])
+            # print(equasion)
+            # print(equasion)
+            # print("bigg recursion!")
+            return float(solvemath(equasion))
+        elif len(ops) == 1:
+            # print("sussywussy")
+            return float(operators[ops[0]](float(values[0]), float(values[1])))
+        else:
+            return values[0]
+    except Exception as e:
+        print(f"Error in line {current_line + 1}: Math error, {e}")
+        print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
+        exit()
+
+
+def findNextBracket(string, start):
+    """finds the next bracket in a string
 
     Args:
-        equasion (string): equasion to solve
-
-    Raises:
-        Exception: Invalid Equasion
+        string (string): string which should include something
+        start (int): index of the bracket whose closing bracket is searched for
 
     Returns:
-        string: solved equasion
+        int: index of the next bracket in the string
     """
-    global vars
-    equasion = str(equasion)
-    for i in vars:
-        equasion = equasion.replace(i, str(vars[i]))
-    allowed = "0123456789*+-/()% "
-    if all(ch in allowed for ch in equasion):
-        # TODO implement math again
-        return 0
-    else:
-        raise Exception("Invalid Equasion")
+    count = 1
+    for i in range(start + 1, len(string)):
+        if string[i] == "(":
+            count += 1
+        elif string[i] == ")":
+            count -= 1
+        if count == 0:
+            return i
+
+    for i in range(start, len(string)):
+
+        if string[i] == "(":
+            return i
+    return -1
 
 
 def boolSolv(pieces):

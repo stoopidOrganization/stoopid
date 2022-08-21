@@ -1,0 +1,9 @@
+#expected:3,2727,826281,2.2
+var:x=1
+var:y=2
+out:x+y
+var:z=69*x+420*y
+out:z*(x+y)
+out:z^2
+var:a=y+0.2
+out:a
