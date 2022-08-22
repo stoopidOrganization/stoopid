@@ -6,3 +6,5 @@ del dist /F /Q /S
 del build /F /Q /S
 rmdir build /S /Q
 rmdir dist /S /Q
+echo Running installer...
+python install.py
