@@ -4,6 +4,8 @@ from sys import exit
 # initialize some default variables
 configPath = "%appdata%\\stoopid"
 libs = {}
+logging = 0
+silent = False
 ## list of all the default usable operators and comparators
 operators = {
     "+": lambda x, y: x + y,
@@ -166,100 +168,84 @@ def convertToBool(val):
 
 
 def solvemath(equasion):
-    try:
-        global operators, vars, orderOfOps, current_line
-        equasion = equasion.replace(" ", "")
-        if "(" in equasion:
-            for k in range(len(equasion)):
-                if equasion[k] == "(":
-                    start = k
+    global operators, vars, orderOfOps, current_line
+    equasion = equasion.replace(" ", "")
+    if "(" in equasion:
+        for k in range(len(equasion)):
+            if equasion[k] == "(":
+                start = k
 
-                    break
-            for k in range(len(equasion) - 1, 0, -1):
-                if equasion[k] == ")":
-                    stop = k
-
-                    break
-            tmpequasion = equasion[:start]
-            tmpequasion += str(int(solvemath(equasion[start + 1 : stop])))
-            tmpequasion += equasion[stop + 1 :]
-            return solvemath(tmpequasion)
-        equasion = str(equasion)
-        for i in vars:
-            equasion = equasion.replace(i, str(vars[i]))
-        ops = []
-        values = []
-
-        x = 0
-        while x < len(equasion):
-            if isnumber(equasion[x]):
-                if x > 0 and (
-                    isnumber(equasion[x - 1])
-                    or values[len(values) - 1][len(values[len(values) - 1]) - 1]
-                    in ["-", "."]
-                ):
-                    values[len(values) - 1] += equasion[x]
-                else:
-                    values.append(str(equasion[x]))
-            elif equasion[x] in [o for o in operators]:
-                if (x == 0 and equasion[x] == "-") or (
-                    x > 0 and not isnumber(equasion[x - 1])
-                ):
-                    values.append(equasion[x])
-                else:
-                    ops.append(str(equasion[x]))
-            elif equasion[x] == ".":
-                if x > 0 and isnumber(equasion[x - 1]):
-                    values[len(values) - 1] += "."
-                else:
-                    values.append("0.")
-            x += 1
-
-        # print(str(ops) + "\n" + str(values))
-        # now we have the values and the operators, find the order in which they should be solved
-        order = []
-        for i in range(len(ops)):
-            for k in range(len(orderOfOps)):
-                if ops[i] in orderOfOps[k]:
-                    order.append(k)
-
-        # print(order)
-
-        # now we have the order in which the operators should be solved, we need to solve them
-        minorder = max(order)
-        for i in range(len(ops)):
-            if order[i] == minorder:
-                values[i] = float(
-                    operators[ops[i]](float(values[i]), float(values[i + 1]))
-                )
-                values.pop(i + 1)
-                ops.pop(i)
-
-                order.pop(i)
                 break
-        # print(f"{values} uwu {ops} owo")
-        # after we have solved the first operator, we need to solve the rest
-        if len(ops) > 1:
-            # recreate the equation
-            equasion = ""
-            for i in range(len(ops)):
-                equasion += str(values[i]) + str((ops[i]))
-            equasion += str(values[-1])
-            # print(equasion)
-            # print(equasion)
-            # print("bigg recursion!")
-            return getAsNumtype((solvemath(equasion)))
+        for k in range(len(equasion) - 1, 0, -1):
+            if equasion[k] == ")":
+                stop = k
 
-        elif len(ops) == 1:
-            # print("sussywussy")
-            return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
-        else:
-            return getAsNumtype(values[0])
-    except Exception as e:
-        raise e
-        # print(f"Error in line {current_line + 1}: Math error, {e}")
-        # print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
-        # exit()
+                break
+        tmpequasion = equasion[:start]
+        tmpequasion += str(int(solvemath(equasion[start + 1 : stop])))
+        tmpequasion += equasion[stop + 1 :]
+        return solvemath(tmpequasion)
+    equasion = str(equasion)
+    for i in vars:
+        equasion = equasion.replace(i, str(vars[i]))
+    ops = []
+    values = []
+
+    x = 0
+    while x < len(equasion):
+        if isnumber(equasion[x]):
+            if x > 0 and (
+                isnumber(equasion[x - 1])
+                or values[len(values) - 1][len(values[len(values) - 1]) - 1]
+                in ["-", "."]
+            ):
+                values[len(values) - 1] += equasion[x]
+            else:
+                values.append(str(equasion[x]))
+        elif equasion[x] in [o for o in operators]:
+            if (x == 0 and equasion[x] == "-") or (
+                x > 0 and not isnumber(equasion[x - 1])
+            ):
+                values.append(equasion[x])
+            else:
+                ops.append(str(equasion[x]))
+        elif equasion[x] == ".":
+            if x > 0 and isnumber(equasion[x - 1]):
+                values[len(values) - 1] += "."
+            else:
+                values.append("0.")
+        x += 1
+
+    # now we have the values and the operators, find the order in which they should be solved
+    order = []
+    for i in range(len(ops)):
+        for k in range(len(orderOfOps)):
+            if ops[i] in orderOfOps[k]:
+                order.append(k)
+
+    # now we have the order in which the operators should be solved, we need to solve them
+    minorder = max(order)
+    for i in range(len(ops)):
+        if order[i] == minorder:
+            values[i] = float(operators[ops[i]](float(values[i]), float(values[i + 1])))
+            values.pop(i + 1)
+            ops.pop(i)
+
+            order.pop(i)
+            break
+    # after we have solved the first operator, we need to solve the rest
+    if len(ops) > 1:
+        # recreate the equation
+        equasion = ""
+        for i in range(len(ops)):
+            equasion += str(values[i]) + str((ops[i]))
+        equasion += str(values[-1])
+        return getAsNumtype((solvemath(equasion)))
+
+    elif len(ops) == 1:
+        return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
+    else:
+        return getAsNumtype(values[0])
 
 
 def findNextBracket(string, start):
@@ -441,7 +427,6 @@ def kwVar(pieces):
     vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value(
         "".join((pieces[1]).split("=")[1:])
     )
-    # print(vars)
 
 
 def kwArr(pieces):
@@ -642,44 +627,6 @@ def NONE(pieces):
     return
 
 
-# get the system arguments
-
-# config
-## no config
-
-## get the filename
-## always the first argument
-overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
-if len(overwrite) == 0:
-    try:
-        file_name = sys.argv[1]
-    except:
-        print("see README.md for usage")
-        time.sleep(5)
-        exit()
-else:
-    print("Running in Override Mode")
-    file_name = overwrite
-
-with open(file_name, "r") as f:
-    program_lines = f.readlines()
-
-## prints the output of the stoopid script into a file
-logging = 0
-if "--log" in sys.argv:
-    logging = 1
-    # get the log file name
-    try:
-        log_file = sys.argv[sys.argv.index("--log") + 1]
-    except:
-        print("please specify filename for log file")
-        time.sleep(5)
-        exit()
-    log = open(log_file, "w")
-
-## disables output completely
-silent = "--silent" in sys.argv
-
 ################
 # dictionary for all keywords and their functions
 # add a keyword here
@@ -701,6 +648,46 @@ keywords = {
     "end": kwEnd,
     "}": NONE,
 }
+
+# get the system arguments
+
+## get the filename, always the first argument
+overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
+if len(overwrite) == 0:
+    try:
+        file_name = sys.argv[1]
+    except:
+        while True:
+            # launch console mode
+            print("--- Using stoopid in console mode ---")
+            linepieces = getline(str(input(">> ")))
+            if linepieces[0] in keywords:
+                keywords[linepieces[0].lower()](linepieces)
+                linepieces = ""
+            else:
+                print("Error: Unknown keyword")
+                continue
+else:
+    print("Running in Override Mode")
+    file_name = overwrite
+
+with open(file_name, "r") as f:
+    program_lines = f.readlines()
+
+## prints the output of the stoopid script into a file
+if "--log" in sys.argv:
+    logging = 1
+    # get the log file name
+    try:
+        log_file = sys.argv[sys.argv.index("--log") + 1]
+    except:
+        print("please specify filename for log file")
+        time.sleep(5)
+        exit()
+    log = open(log_file, "w")
+
+## disables output completely
+silent = "--silent" in sys.argv
 
 # main loops
 
