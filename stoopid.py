@@ -411,6 +411,30 @@ def resource_path(relative_path):
     return os.path.join(base_path, relative_path)
 
 
+def searchInLib(pieces):
+    global libs, vars, arrs, bools, labels, silent, operators, comparators, configPath, orderOfOps, current_line
+    for l in libs:
+        if pieces[0] in libs[l]["keywords"]:
+            libs[l]["keywords"][pieces[0]](
+                pieces,
+                {
+                    "vars": vars,
+                    "arrs": arrs,
+                    "bools": bools,
+                    "labels": labels,
+                    "logging": logging,
+                    "silent": silent,
+                    "operators": operators,
+                    "comparators": comparators,
+                    "configPath": configPath,
+                    "orderOfOps": orderOfOps,
+                    "current_line": current_line,
+                },
+            )
+            return True
+    return False
+
+
 # keyword functions
 
 
@@ -717,30 +741,7 @@ while current_line < len(program_lines):
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     else:
-        found = False
-        for l in libs:
-            for k in libs[l]["keywords"]:
-                if k == linepieces[0]:
-                    libs[l]["keywords"][k](
-                        linepieces,
-                        {
-                            "vars": vars,
-                            "arrs": arrs,
-                            "bools": bools,
-                            "labels": labels,
-                            "logging": logging,
-                            "silent": silent,
-                            "operators": operators,
-                            "comparators": comparators,
-                            "configPath": configPath,
-                            "orderOfOps": orderOfOps,
-                        },
-                    )
-                    found = True
-                    break
-            if found:
-                break
-        if not found:
+        if not searchInLib(linepieces):
             print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
             exit()
     current_line += 1
