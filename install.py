@@ -18,14 +18,13 @@ for file in files:
 user=os.getenv("USERNAME")
 cpath=os.getenv("PATH")
 
-if not installdir in cpath:
+if not installdir in cpath and input("Do you want to add stoopid to path? [y/n]").strip()=="y":
     cpath+=";%s" % installdir
     #print(cpath)
     command="setx PATH \"%s\"" % cpath
     #print(command)
     os.system(command)
     print("Added %s to PATH" % installdir)
-
-print("You can now run stoopid by typing stoopid in your terminal")
+    print("You can now run stoopid by typing stoopid in your terminal")
 
 print("Installation complete!")
