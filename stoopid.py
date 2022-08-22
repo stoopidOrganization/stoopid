@@ -661,7 +661,10 @@ if len(overwrite) == 0:
         print("--- Using stoopid in console mode ---")
         while True:
             linepieces = getline(str(input(">> ")))
-            if linepieces[0] in keywords:
+            if not linepieces:
+                print("Error: No keyword given")
+                continue
+            elif linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
                 linepieces = ""
             else:
