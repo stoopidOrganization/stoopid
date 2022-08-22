@@ -18,8 +18,11 @@ if input("Do you want to install or update stoopid? (y/n)")=="y":
     user=os.getenv("USERNAME")
     #get the path for the current user
     cpath=os.popen("reg query \"HKCU\Environment\" /v PATH").read()
-    cpath=cpath.split("REG_SZ")[1].strip()
-    #print(cpath)
+    
+    cpath=cpath.split("REG")[1].strip()
+    while cpath[0]!=" ":
+        cpath=cpath[1:]
+    cpath.strip()
     if not installdir in cpath and input("Do you want to add stoopid to path? [y/n]").strip()=="y":
         cpath+=";%s" % installdir
         #print(cpath)

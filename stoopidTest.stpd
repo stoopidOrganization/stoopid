@@ -1,0 +1,16 @@
+#expected:Hello World!,200,This is working,30
+var:a=10
+var:b=20
+var:hi=Hello World!
+out:hi
+out:a*b
+var:yes=true
+var:no=false
+if:yes{
+    out:This is working
+}
+if:no{
+    out:This is not working
+}
+math:a:a+b
+out:a
