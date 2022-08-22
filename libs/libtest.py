@@ -1,15 +1,9 @@
 # testLib
-defaults = {}
-
-
-def testcmd(pieces):
+def testcmd(pieces, defaults):
     print("this is a test and i am testing: " + pieces[1])
 
 
-def main(mainDefaults):
-    global defaults
-    defaults = mainDefaults
-
+def main():
     keywords = {"test": testcmd}
 
     return keywords

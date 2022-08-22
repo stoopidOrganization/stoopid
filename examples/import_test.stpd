@@ -1,2 +1,2 @@
 import : testlib
-test : hello world
+testlib.test : hello world

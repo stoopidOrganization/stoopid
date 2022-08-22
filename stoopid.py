@@ -587,26 +587,16 @@ def kwImport(pieces):
 
         imp = __import__(lib)
         if lib not in libs:
-            libs[lib] = imp
-            libkws = imp.main(
-                {
-                    "vars": vars,
-                    "arrs": arrs,
-                    "bools": bools,
-                    "labels": labels,
-                    "logging": logging,
-                    "silent": silent,
-                    "operators": operators,
-                    "comparators": comparators,
-                    "configPath": configPath,
-                    "orderOfOps": orderOfOps,
-                }
-            )
+            libs[lib] = {
+                "bin": imp,
+                "keywords": {},
+            }
 
-            for l in libkws:
-                keywords[l] = libkws[l]
+            for l in imp.main():
+                libs[lib]["keywords"][str(f"{str(lib)}.{str(l)}")] = imp.main()[l]
     except Exception as e:
         print(f"Error in line {current_line + 1}: Library {lib} not found")
+        print(e)
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
@@ -669,6 +659,8 @@ if len(overwrite) == 0:
             elif linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
                 linepieces = ""
+            elif linepieces[0] in [libs[l]["keywords"] for l in libs]:
+                print("deez")
             else:
                 print("Error: Unknown keyword")
                 continue
@@ -725,6 +717,30 @@ while current_line < len(program_lines):
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     else:
-        print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
-        exit()
+        found = False
+        for l in libs:
+            for k in libs[l]["keywords"]:
+                if k == linepieces[0]:
+                    libs[l]["keywords"][k](
+                        linepieces,
+                        {
+                            "vars": vars,
+                            "arrs": arrs,
+                            "bools": bools,
+                            "labels": labels,
+                            "logging": logging,
+                            "silent": silent,
+                            "operators": operators,
+                            "comparators": comparators,
+                            "configPath": configPath,
+                            "orderOfOps": orderOfOps,
+                        },
+                    )
+                    found = True
+                    break
+            if found:
+                break
+        if not found:
+            print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
+            exit()
     current_line += 1
