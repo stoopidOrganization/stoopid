@@ -580,18 +580,6 @@ def kwImport(pieces):
     """
     try:
         global libs, keywords, vars, arrs, bools, labels, logging, silent, operators, comparators, orderOfOps, configPath
-        defaults = {
-            "vars": vars,
-            "arrs": arrs,
-            "bools": bools,
-            "labels": labels,
-            "logging": logging,
-            "silent": silent,
-            "operators": operators,
-            "comparators": comparators,
-            "configPath": configPath,
-            "orderOfOps": orderOfOps,
-        }
         lib = pieces[1]
         path = os.path.join(getPath(configPath), "libs")
         if not path in sys.path:
@@ -600,13 +588,25 @@ def kwImport(pieces):
         imp = __import__(lib)
         if lib not in libs:
             libs[lib] = imp
-            libkws = imp.main(defaults)
+            libkws = imp.main(
+                {
+                    "vars": vars,
+                    "arrs": arrs,
+                    "bools": bools,
+                    "labels": labels,
+                    "logging": logging,
+                    "silent": silent,
+                    "operators": operators,
+                    "comparators": comparators,
+                    "configPath": configPath,
+                    "orderOfOps": orderOfOps,
+                }
+            )
 
             for l in libkws:
                 keywords[l] = libkws[l]
     except Exception as e:
         print(f"Error in line {current_line + 1}: Library {lib} not found")
-        print(e)
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
