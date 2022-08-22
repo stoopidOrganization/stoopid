@@ -1,5 +1,5 @@
 #Tests for stoopid interpreter
-import os
+import os,sys
 def test_file(file):
     with open(file, "r") as f:
         header = f.readlines()[0]
@@ -24,19 +24,20 @@ def test_file(file):
         if i.strip().replace("\n","")!="":
             o.append(i.strip().replace("\n",""))
             print(i.strip().replace("\n",""))
+    failed="Passed"
     for i in range(len(expected)):
         try:
             if o[i].strip()!=expected[i].strip():
-                print(f"{file} failed")
-                return 0
+                print(f"{file} failed in line {i+1}")
+                failed="Failed"
         except Exception:
-            print(f"{file} failed")
-            return 0
-    print(f"\n {file} passed")
-    print("Cleaning up...")
-    os.system("rm output.txt")
+            print(f"{file} failed in line {i+1} (something happened, idk)")
+            failed="Failed"
+    print(f"\n {file} {failed}")
+
+    os.system("del output.txt")
     return 1
 
 
 
-test_file("test.stpd")
+test_file(sys.argv[1])

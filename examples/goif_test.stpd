@@ -1,7 +1,7 @@
 #A test program that counts from 1 to 10
 var : variable = 0
 bool : test = True
-math : variable : variable + 1 :loop:label #loop is just a name in this case
+var : variable = variable + 1 :loop:label #loop is just a name in this case
 out : variable
 sleep : 0.1
 goif : loop : test #test variable

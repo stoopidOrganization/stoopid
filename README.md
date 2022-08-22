@@ -4,6 +4,14 @@
 - Python: `python stoopid.py <filename>`
 - Executable: `stoopid.exe <filename>`
 ##
+
+# DISCLAIMER:
+### Due to a temporary math solving algorythm which uses funcitons which are considered
+### risky, the exe currently might be detected as a virus.
+### Dont wory, this is a FALSE POSITIVE, as the source code and tools to build your own exe are open source.
+### We are are expecting a new math solving algorythm to be implemented in the near future, which should resolve this issue.
+
+
 ##### Aditional Parameters
 | Parameter | Description |
 | --------- | ----------- |
