@@ -33,3 +33,5 @@ if input("Do you want to install or update stoopid? (y/n)")=="y":
             print("Stoopid is already in path")
         print("Not adding to path...")
     print("Installation complete!")
+else:
+    print("Installation cancelled")
