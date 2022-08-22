@@ -2,7 +2,7 @@ import time, sys, os, subprocess
 from sys import exit
 
 # initialize some default variables
-configPath = "%appdata%\\stoopid"
+configPath = "%userprofile%\\appdata\\roaming\\stoopid"
 libs = {}
 logging = 0
 silent = False
@@ -369,17 +369,15 @@ def getPath(path):
         string: resolved path
     """
     try:
-        pathlist = path.replace("%", "").split("\\")
-
+        pathlist = path.split("\\")
         for p in range(len(pathlist)):
-            if os.getenv(pathlist[p]) != None:
-                pathlist[p] = os.getenv(pathlist[p])
+            if "%" in pathlist[p]:
+                pathlist[p] = os.getenv(pathlist[p].replace("%", ""))
 
-        fetchedPath = os.path.join(pathlist[0])
-        p = 1
-        while p < len(pathlist):
-            fetchedPath = os.path.join(fetchedPath, pathlist[p])
-            p += 1
+        fetchedPath = ""
+        for x in pathlist:
+            fetchedPath = os.path.join(fetchedPath, x)
+
         subprocess.run(
             f"mkdir {fetchedPath}",
             stdout=subprocess.DEVNULL,
@@ -411,6 +409,30 @@ def resource_path(relative_path):
         base_path = os.path.abspath(".")
 
     return os.path.join(base_path, relative_path)
+
+
+def searchInLib(pieces):
+    global libs, vars, arrs, bools, labels, silent, operators, comparators, configPath, orderOfOps, current_line
+    for l in libs:
+        if pieces[0] in libs[l]["keywords"]:
+            libs[l]["keywords"][pieces[0]](
+                pieces,
+                {
+                    "vars": vars,
+                    "arrs": arrs,
+                    "bools": bools,
+                    "labels": labels,
+                    "logging": logging,
+                    "silent": silent,
+                    "operators": operators,
+                    "comparators": comparators,
+                    "configPath": configPath,
+                    "orderOfOps": orderOfOps,
+                    "current_line": current_line,
+                },
+            )
+            return True
+    return False
 
 
 # keyword functions
@@ -580,31 +602,25 @@ def kwImport(pieces):
     Args:
         pieces (String List): list of all pieces in the line
     """
-    global libs, keywords, configPath
     try:
+        global libs, keywords, vars, arrs, bools, labels, logging, silent, operators, comparators, orderOfOps, configPath
         lib = pieces[1]
-
         path = os.path.join(getPath(configPath), "libs")
-
-        subprocess.run(
-            f"mkdir {path}",
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            shell=True,
-        )
-
         if not path in sys.path:
             sys.path.append(path)
 
         imp = __import__(lib)
         if lib not in libs:
-            libs[lib] = imp
-            libkws = imp.main()
+            libs[lib] = {
+                "bin": imp,
+                "keywords": {},
+            }
 
-            for l in libkws:
-                keywords[l] = libkws[l]
+            for l in imp.main():
+                libs[lib]["keywords"][str(f"{str(lib)}.{str(l)}")] = imp.main()[l]
     except Exception as e:
         print(f"Error in line {current_line + 1}: Library {lib} not found")
+        print(e)
         print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
@@ -667,6 +683,8 @@ if len(overwrite) == 0:
             elif linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
                 linepieces = ""
+            elif linepieces[0] in [libs[l]["keywords"] for l in libs]:
+                print("deez")
             else:
                 print("Error: Unknown keyword")
                 continue
@@ -723,6 +741,7 @@ while current_line < len(program_lines):
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     else:
-        print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
-        exit()
+        if not searchInLib(linepieces):
+            print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
+            exit()
     current_line += 1
