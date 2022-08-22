@@ -19,12 +19,12 @@ if input("Do you want to install or update stoopid? (y/n)")=="y":
     #get the path for the current user
     cpath=os.popen("reg query \"HKCU\Environment\" /v PATH").read()
     cpath=cpath.split("REG_SZ")[1].strip()
-    print(cpath)
+    #print(cpath)
     if not installdir in cpath and input("Do you want to add stoopid to path? [y/n]").strip()=="y":
         cpath+=";%s" % installdir
-        print(cpath)
+        #print(cpath)
         command="setx PATH \"%s\"" % cpath
-        print(command)
+        #print(command)
         os.system(command)
         print("Added %s to PATH" % installdir)
         print("You can now run stoopid by typing stoopid in your terminal")
