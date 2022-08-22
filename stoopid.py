@@ -658,6 +658,8 @@ if len(overwrite) == 0:
         file_name = sys.argv[1]
     except:
         while True:
+            # launch console mode
+            print("--- Using stoopid in console mode ---")
             linepieces = getline(str(input(">> ")))
             if linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
