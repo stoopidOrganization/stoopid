@@ -1,9 +1,9 @@
 #A test program that counts from 1 to 10
 var : variable = 0
-var : variable = variable + 1 :loop:label #loop is just a name in this case
+variable = variable + 1 :loop:label #loop is just a name in this case
 out : variable
 sleep : 0.1
 goif : loop : variable << 10#test variable
-var : variable = 1
+variable = 1
 #out : variable
 goto : 4 
