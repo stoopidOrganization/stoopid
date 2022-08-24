@@ -273,7 +273,13 @@ def findNextBracket(string, start):
             return i
     return -1
 
-
+def varSet(line):
+    global vars
+    line = line.split("=")
+    if line[0].strip() in vars:
+        vars[line[0].strip()] = get_value(line[1].strip())
+    else:
+        raise Exception("Unknown command: " + line[0].strip())
 def boolSolv(pieces):
     """checks bools and resolves them
 
@@ -723,6 +729,9 @@ while current_line < len(program_lines):
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     else:
-        print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
-        exit()
+        try:
+            varSet(linepieces[0])
+        except Exception as e:
+            print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
+            exit()
     current_line += 1
