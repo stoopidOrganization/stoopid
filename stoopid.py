@@ -1,4 +1,3 @@
-from ast import Num
 import time, sys, os, subprocess
 from sys import exit
 
