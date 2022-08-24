@@ -168,6 +168,14 @@ def convertToBool(val):
 
 
 def solvemath(equasion):
+    """Solves the given equasion
+
+    Args:
+        equasion (string): the mathematical equasion to be solved
+
+    Returns:
+        float: solved equasion
+    """
     global operators, vars, orderOfOps, current_line
     equasion = equasion.replace(" ", "")
     if "(" in equasion:
@@ -273,14 +281,25 @@ def findNextBracket(string, start):
             return i
     return -1
 
-def varSet(line):
+
+def varSet(pieces):
+    """Sets the value of a variable without the var keyword
+
+    Args:
+        pieces (list[str]): list of all pieces in the line
+
+    Returns:
+        bool: if variable was found
+    """
     global vars
-    line = line.split("=")
-    if line[0].strip() in vars:
-        vars[line[0].strip()] = get_value(line[1].strip())
+    pieces = pieces.split("=")
+    if pieces[0].strip() in vars:
+        vars[pieces[0].strip()] = get_value(pieces[1].strip())
         return 1
     else:
         return 0
+
+
 def boolSolv(pieces):
     """checks bools and resolves them
 
@@ -357,6 +376,17 @@ def boolSolv(pieces):
 
 
 def getAsNumtype(num):
+    """converts a string to a number and checks if its a float or an int
+
+    Args:
+        num (str): number to convert
+
+    Raises:
+        Exception: if num isnt a number
+
+    Returns:
+        float or int: convertet number
+    """
     try:
         if is_float(num):
             return float(num)
@@ -419,6 +449,14 @@ def resource_path(relative_path):
 
 
 def searchInLib(pieces):
+    """search all libraries for given keyword
+
+    Args:
+        pieces (list[str]): list of all pieces in the line
+
+    Returns:
+        bool: if keyword was found
+    """
     global libs, vars, arrs, bools, labels, silent, operators, comparators, configPath, orderOfOps, current_line
     for l in libs:
         if pieces[0] in libs[l]["keywords"]:
@@ -449,7 +487,7 @@ def kwVar(pieces):
     """Adds a variable to the list of variables
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global vars, current_line
 
@@ -462,7 +500,7 @@ def kwArr(pieces):
     """Adds an array to the list of arrays
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global arrs
     arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
@@ -472,7 +510,7 @@ def kwApp(pieces):
     """Appends to an array
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global arrs
     arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
@@ -482,7 +520,7 @@ def kwGetArr(pieces):
     """Gets the value of an item in an array at a specific index
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global vars, arrs
     vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
@@ -492,7 +530,7 @@ def kwSetArr(pieces):
     """Sets the value of a specific item in an array
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global arrs
     arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
@@ -502,7 +540,7 @@ def kwOut(pieces):
     """Prints the given input
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global bools, logging, log
     if pieces[1] in bools:
@@ -519,7 +557,7 @@ def kwGoTo(pieces):
     """Sets the current line of the interpreter
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global labels, current_line
     if pieces[1] in labels:
@@ -536,7 +574,7 @@ def kwSleep(pieces):
     """Sleeps the given time
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     time.sleep(float(pieces[1]))
 
@@ -545,7 +583,7 @@ def kwGoIf(pieces):
     """Sets the current line of the interpreter if given condition is true
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global current_line, labels
     res = boolSolv(pieces[2:])
@@ -565,7 +603,7 @@ def kwIf(pieces):
     """Executes codeblock in curly brackets if condition is true
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global current_line
     res = boolSolv(pieces[1:])
@@ -587,7 +625,7 @@ def kwBool(pieces):
     """Creates a boolean
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     global bools
     name = get_nonum(pieces[1], current_line).split("=")[0].strip()
@@ -607,7 +645,7 @@ def kwImport(pieces):
     """Imports a library
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     try:
         global libs, keywords, vars, arrs, bools, labels, logging, silent, operators, comparators, orderOfOps, configPath
@@ -636,7 +674,7 @@ def kwEnd(pieces):
     """Ends the programm
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     exit()
 
@@ -645,16 +683,16 @@ def NONE(pieces):
     """Placeholder for keywords that do nothing
 
     Args:
-        pieces (String List): list of all pieces in the line
+        pieces (list[str]): list of all pieces in the line
     """
     return
 
 
-################
-# dictionary for all keywords and their functions
-# add a keyword here
-# create a function for it called kw<Keyword>
-################
+"""
+- dictionary for all keywords and their functions
+- add a keyword here
+- create a function for it called kw<Keyword>
+"""
 keywords = {
     "var": kwVar,
     "arr": kwArr,
@@ -746,6 +784,6 @@ while current_line < len(program_lines):
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
     elif not searchInLib(linepieces) and not varSet(linepieces[0]):
-            print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
-            exit()
+        print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
+        exit()
     current_line += 1
