@@ -1,3 +1,4 @@
+from ast import Num
 import time, sys, os, subprocess
 from sys import exit
 
@@ -5,7 +6,7 @@ from sys import exit
 configPath = "%userprofile%\\appdata\\roaming\\stoopid"
 libs = {}
 logging = 0
-silent = False
+silent = 0
 ## list of all the default usable operators and comparators
 operators = {
     "+": lambda x, y: x + y,
@@ -35,23 +36,23 @@ labels = {}
 current_line = 0
 
 # helper functions
-def isnumber(string):
+def isnumber(number: str) -> bool:
     """Test if given string is a number
 
     Args:
-        string (string): input string
+        number (str): input number
 
     Returns:
-        boolean: if given string is number
+        bool: if given string is number
     """
     try:
-        float(string)
+        float(input)
         return True
     except ValueError:
         return False
 
 
-def is_float(number):
+def is_float(number: int | float) -> bool:
     """Test if given number is a float
 
     Args:
@@ -69,11 +70,11 @@ def is_float(number):
         return False
 
 
-def get_nonum(inp, lineNum):
+def get_nonum(inp: str, lineNum: int) -> str:
     """Test if given input is not a number
 
     Args:
-        inp : input string
+        inp (str) : input string
         lineNum (int): current line
 
     Returns:
@@ -85,14 +86,14 @@ def get_nonum(inp, lineNum):
     return inp
 
 
-def get_value(inp):
+def get_value(inp: str) -> float | int | str | bool:
     """Gets current value of any variable
 
     Args:
-        inp (string): variable name
+        inp (str): variable name
 
     Returns:
-        any: value of given variable
+        (float | int | str | bool): value of given variable
     """
     global vars, bools
     inp = str(inp).strip()
@@ -117,14 +118,14 @@ def get_value(inp):
                 return inp
 
 
-def getline(line):
+def getline(line: str) -> list[str]:
     """returns a list of all pieces in the line
 
     Args:
         line (string): the full line to be split
 
     Returns:
-        string list: list of all pieces in a line
+        (list[str]): list of all pieces in a line
     """
     line.strip()
     if line == "" or line.startswith("'"):
@@ -136,15 +137,15 @@ def getline(line):
     return linepieces
 
 
-def search_array(string, array):
+def search_array(string: str, array: list[str]) -> int | str:
     """tests if an element in an array is in the string
 
     Args:
-        string (string): string which should include something
-        array (string array): list of values which the string could include
+        string (str): string which should include something
+        array (list[str]): list of values which the string could include
 
     Returns:
-        string or int: value which is included in the string or -1
+        (str | int): value which is included in the string or -1
     """
     for k in range(len(array)):
         if array[k] in string:
@@ -152,14 +153,14 @@ def search_array(string, array):
     return -1
 
 
-def convertToBool(val):
+def convertToBool(val: str) -> str | bool:
     """Converts booleans as string to real booleans
 
     Args:
-        val (string): Value to convert to boolean
+        val (str): Value to convert to boolean
 
     Returns:
-        string or bool: the boolean which was given or if it isnt a boolean it just returns the value
+        (str | bool): the boolean which was given or if it isnt a boolean it just returns the value
     """
     if val == "True" or val == "False":
         return {"True": 1, "False": 0}[val]
@@ -167,11 +168,11 @@ def convertToBool(val):
         return val
 
 
-def solvemath(equasion):
+def solvemath(equasion: str) -> float:
     """Solves the given equasion
 
     Args:
-        equasion (string): the mathematical equasion to be solved
+        equasion (str): the mathematical equasion to be solved
 
     Returns:
         float: solved equasion
@@ -256,11 +257,11 @@ def solvemath(equasion):
         return getAsNumtype(values[0])
 
 
-def findNextBracket(string, start):
+def findNextBracket(string: str, start: int) -> int:
     """finds the next bracket in a string
 
     Args:
-        string (string): string which should include something
+        string (str): string which should include something
         start (int): index of the bracket whose closing bracket is searched for
 
     Returns:
@@ -282,7 +283,7 @@ def findNextBracket(string, start):
     return -1
 
 
-def varSet(pieces):
+def varSet(pieces: list[str]) -> bool:
     """Sets the value of a variable without the var keyword
 
     Args:
@@ -300,7 +301,7 @@ def varSet(pieces):
         return 0
 
 
-def boolSolv(pieces):
+def boolSolv(pieces: list[str]) -> bool:
     """checks bools and resolves them
 
     Args:
@@ -375,7 +376,7 @@ def boolSolv(pieces):
         exit()
 
 
-def getAsNumtype(num):
+def getAsNumtype(num: str) -> float | int:
     """converts a string to a number and checks if its a float or an int
 
     Args:
@@ -396,7 +397,7 @@ def getAsNumtype(num):
         raise Exception("Invalid data type")
 
 
-def getPath(path):
+def getPath(path: str) -> str:
     """resolves the given path
 
     Args:
@@ -430,25 +431,7 @@ def getPath(path):
         exit()
 
 
-def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller
-
-    Args:
-        relative_path (string): relative path to the resource
-
-    Returns:
-        string: path to the resource
-    """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
-
-
-def searchInLib(pieces):
+def searchInLib(pieces: list[str]) -> bool:
     """search all libraries for given keyword
 
     Args:
@@ -483,7 +466,7 @@ def searchInLib(pieces):
 # keyword functions
 
 
-def kwVar(pieces):
+def kwVar(pieces: list[str]) -> None:
     """Adds a variable to the list of variables
 
     Args:
@@ -496,7 +479,7 @@ def kwVar(pieces):
     )
 
 
-def kwArr(pieces):
+def kwArr(pieces: list[str]) -> None:
     """Adds an array to the list of arrays
 
     Args:
@@ -506,7 +489,7 @@ def kwArr(pieces):
     arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 
-def kwApp(pieces):
+def kwApp(pieces: list[str]) -> None:
     """Appends to an array
 
     Args:
@@ -516,7 +499,7 @@ def kwApp(pieces):
     arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
 
 
-def kwGetArr(pieces):
+def kwGetArr(pieces: list[str]) -> None:
     """Gets the value of an item in an array at a specific index
 
     Args:
@@ -526,7 +509,7 @@ def kwGetArr(pieces):
     vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
 
 
-def kwSetArr(pieces):
+def kwSetArr(pieces: list[str]) -> None:
     """Sets the value of a specific item in an array
 
     Args:
@@ -536,7 +519,7 @@ def kwSetArr(pieces):
     arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
 
 
-def kwOut(pieces):
+def kwOut(pieces: list[str]) -> None:
     """Prints the given input
 
     Args:
@@ -553,7 +536,7 @@ def kwOut(pieces):
         log.write(str(out) + "\n")
 
 
-def kwGoTo(pieces):
+def kwGoTo(pieces: list[str]) -> None:
     """Sets the current line of the interpreter
 
     Args:
@@ -570,7 +553,7 @@ def kwGoTo(pieces):
         exit()
 
 
-def kwSleep(pieces):
+def kwSleep(pieces: list[str]) -> None:
     """Sleeps the given time
 
     Args:
@@ -579,7 +562,7 @@ def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
 
-def kwGoIf(pieces):
+def kwGoIf(pieces: list[str]) -> None:
     """Sets the current line of the interpreter if given condition is true
 
     Args:
@@ -599,7 +582,7 @@ def kwGoIf(pieces):
             exit()
 
 
-def kwIf(pieces):
+def kwIf(pieces: list[str]) -> None:
     """Executes codeblock in curly brackets if condition is true
 
     Args:
@@ -621,7 +604,7 @@ def kwIf(pieces):
                 exit()
 
 
-def kwBool(pieces):
+def kwBool(pieces: list[str]) -> None:
     """Creates a boolean
 
     Args:
@@ -641,7 +624,7 @@ def kwBool(pieces):
     bools[name] = value
 
 
-def kwImport(pieces):
+def kwImport(pieces: list[str]) -> None:
     """Imports a library
 
     Args:
@@ -670,7 +653,7 @@ def kwImport(pieces):
         exit()
 
 
-def kwEnd(pieces):
+def kwEnd(pieces: list[str]) -> None:
     """Ends the programm
 
     Args:
@@ -679,7 +662,7 @@ def kwEnd(pieces):
     exit()
 
 
-def NONE(pieces):
+def NONE(pieces: list[str]) -> None:
     """Placeholder for keywords that do nothing
 
     Args:
@@ -751,7 +734,7 @@ if "--log" in sys.argv:
     log = open(log_file, "w")
 
 ## disables output completely
-silent = "--silent" in sys.argv
+silent: bool = "--silent" in sys.argv
 
 # main loops
 
