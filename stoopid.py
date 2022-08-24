@@ -690,9 +690,7 @@ if len(overwrite) == 0:
             elif linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
                 linepieces = ""
-            elif linepieces[0] in [libs[l]["keywords"] for l in libs]:
-                print("deez")
-            else:
+            elif not searchInLib(linepieces) and not varSet(linepieces[0]):
                 print("Error: Unknown keyword")
                 continue
 else:
