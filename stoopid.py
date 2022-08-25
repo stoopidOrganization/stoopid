@@ -69,7 +69,7 @@ def isFloat(num: str) -> bool:
         return False
 
 
-def get_nonum(inp: str, lineNum: int) -> str:
+def getNoNum(inp: str, lineNum: int) -> str:
     """Test if given input is not a number
 
     Args:
@@ -84,7 +84,7 @@ def get_nonum(inp: str, lineNum: int) -> str:
     return inp
 
 
-def get_value(inp: str) -> float | int | str | bool:
+def getValue(inp: str) -> float | int | str | bool:
     """Gets current value of any variable
 
     Args:
@@ -97,23 +97,16 @@ def get_value(inp: str) -> float | int | str | bool:
     inp = str(inp).strip()
 
     if isNumber(inp):
-        if isFloat(inp):
-            return float(inp)
-        else:
-            return int(inp)
-    else:
-        if inp in vars:
-            return vars[inp]
-        elif inp in bools:
-            if bools[inp]:
-                return 1
-            elif bools[inp] == 0:
-                return 0
-        else:
-            try:
-                return solvemath(inp)
-            except:
-                return inp
+        return getAsNumtype(inp)
+    elif inp in vars:
+        return vars[inp]
+    elif inp in bools:
+        return bools[inp]
+
+    try:
+        return solvemath(inp)
+    except:
+        return inp
 
 
 def getline(line: str) -> list[str]:
@@ -293,7 +286,7 @@ def varSet(pieces: list[str]) -> bool:
     global vars
     pieces = pieces.split("=")
     if pieces[0].strip() in vars:
-        vars[pieces[0].strip()] = get_value(pieces[1].strip())
+        vars[pieces[0].strip()] = getValue(pieces[1].strip())
         return 1
     else:
         return 0
@@ -333,7 +326,7 @@ def boolSolv(pieces: list[str]) -> bool:
                 if mop in vars:
                     mop = vars[mop]
                 if mop in bools:
-                    results.append(get_value(mop))
+                    results.append(getValue(mop))
                 elif mop.lower() == "true" or mop == "1":
                     results.append(1)
                 elif mop.lower() == "false" or mop == "0":
@@ -344,8 +337,8 @@ def boolSolv(pieces: list[str]) -> bool:
                     )
                     exit()
             else:
-                var1 = get_value(mop.split(comp)[0])
-                var2 = get_value(mop.split(comp)[1])
+                var1 = getValue(mop.split(comp)[0])
+                var2 = getValue(mop.split(comp)[1])
 
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
@@ -472,7 +465,7 @@ def kwVar(pieces: list[str]) -> None:
     """
     global vars, current_line
 
-    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value(
+    vars[getNoNum(pieces[1], current_line).split("=")[0].strip()] = getValue(
         "".join((pieces[1]).split("=")[1:])
     )
 
@@ -484,7 +477,7 @@ def kwArr(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
+    arrs[getNoNum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 
 def kwApp(pieces: list[str]) -> None:
@@ -494,7 +487,7 @@ def kwApp(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
+    arrs[getNoNum(pieces[1], current_line)].append(float(getValue(pieces[2])))
 
 
 def kwGetArr(pieces: list[str]) -> None:
@@ -504,7 +497,7 @@ def kwGetArr(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global vars, arrs
-    vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
+    vars[str(pieces[3])] = arrs[str(pieces[1])][getValue(pieces[2])]
 
 
 def kwSetArr(pieces: list[str]) -> None:
@@ -514,7 +507,7 @@ def kwSetArr(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
+    arrs[str(pieces[1])][getValue(pieces[2])] = getValue(pieces[3])
 
 
 def kwOut(pieces: list[str]) -> None:
@@ -527,7 +520,7 @@ def kwOut(pieces: list[str]) -> None:
     if pieces[1] in bools:
         out = ["False", "True"][int(bools[pieces[1]])]
     else:
-        out = get_value(pieces[1])
+        out = getValue(pieces[1])
     if not silent:
         print(out)
     if logging:
@@ -609,15 +602,15 @@ def kwBool(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global bools
-    name = get_nonum(pieces[1], current_line).split("=")[0].strip()
-    value = get_value(pieces[1].split("=")[1])
+    name = getNoNum(pieces[1], current_line).split("=")[0].strip()
+    value = getValue(pieces[1].split("=")[1])
 
     if value == "True":
         value = 1
     elif value == "False":
         value = 0
     else:
-        value = boolSolv(get_nonum(pieces[1], current_line).split("=")[1:])
+        value = boolSolv(getNoNum(pieces[1], current_line).split("=")[1:])
 
     bools[name] = value
 
@@ -742,7 +735,7 @@ for i in range(len(program_lines)):
         linepieces = getline(program_lines[i])
 
         if linepieces[-1] == "label":  # :name:label at the end of the line
-            labels[get_nonum(linepieces[-2], i)] = i
+            labels[getNoNum(linepieces[-2], i)] = i
     except Exception as e:
         print(f"Error in line {i + 1} while resolving labels:\n{str(e)}")
         exit()
