@@ -35,33 +35,33 @@ labels = {}
 current_line = 0
 
 # helper functions
-def isnumber(number: str) -> bool:
+def isNumber(num: str) -> bool:
     """Test if given string is a number
 
     Args:
-        number (str): input number
+        num (str): input number
 
     Returns:
         bool: if given string is number
     """
     try:
-        float(number)
+        float(num)
         return True
     except ValueError:
         return False
 
 
-def is_float(number: int | float) -> bool:
+def isFloat(num: str) -> bool:
     """Test if given number is a float
 
     Args:
-        number : number to test
+        num : number to test
 
     Returns:
         boolean: if number is a float
     """
     try:
-        if float(number) == int(number):
+        if float(num) == int(num):
             return False
         else:
             return True
@@ -79,7 +79,7 @@ def get_nonum(inp: str, lineNum: int) -> str:
     Returns:
         string: input as not a number
     """
-    if isnumber(inp):
+    if isNumber(inp):
         print(f"Error in line {lineNum + 1}: String expected, but got number: {inp}")
     return inp
 
@@ -96,8 +96,8 @@ def get_value(inp: str) -> float | int | str | bool:
     global vars, bools
     inp = str(inp).strip()
 
-    if isnumber(inp):
-        if is_float(inp):
+    if isNumber(inp):
+        if isFloat(inp):
             return float(inp)
         else:
             return int(inp)
@@ -200,9 +200,9 @@ def solvemath(equasion: str) -> float:
 
     x = 0
     while x < len(equasion):
-        if isnumber(equasion[x]):
+        if isNumber(equasion[x]):
             if x > 0 and (
-                isnumber(equasion[x - 1])
+                isNumber(equasion[x - 1])
                 or values[len(values) - 1][len(values[len(values) - 1]) - 1]
                 in ["-", "."]
             ):
@@ -211,13 +211,13 @@ def solvemath(equasion: str) -> float:
                 values.append(str(equasion[x]))
         elif equasion[x] in [o for o in operators]:
             if (x == 0 and equasion[x] == "-") or (
-                x > 0 and not isnumber(equasion[x - 1])
+                x > 0 and not isNumber(equasion[x - 1])
             ):
                 values.append(equasion[x])
             else:
                 ops.append(str(equasion[x]))
         elif equasion[x] == ".":
-            if x > 0 and isnumber(equasion[x - 1]):
+            if x > 0 and isNumber(equasion[x - 1]):
                 values[len(values) - 1] += "."
             else:
                 values.append("0.")
@@ -387,7 +387,7 @@ def getAsNumtype(num: str) -> float | int:
         float or int: convertet number
     """
     try:
-        if is_float(num):
+        if isFloat(num):
             return float(num)
         else:
             return int(num)
