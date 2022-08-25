@@ -45,7 +45,7 @@ def isnumber(number: str) -> bool:
         bool: if given string is number
     """
     try:
-        float(input)
+        float(number)
         return True
     except ValueError:
         return False
@@ -79,7 +79,6 @@ def get_nonum(inp: str, lineNum: int) -> str:
     Returns:
         string: input as not a number
     """
-    global current_line
     if isnumber(inp):
         print(f"Error in line {lineNum + 1}: String expected, but got number: {inp}")
     return inp
