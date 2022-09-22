@@ -5,7 +5,7 @@ from sys import exit
 configPath = "%userprofile%\\appdata\\roaming\\stoopid"
 libs = {}
 logging = 0
-silent = False
+silent = 0
 ## list of all the default usable operators and comparators
 operators = {
     "+": lambda x, y: x + y,
@@ -35,33 +35,33 @@ labels = {}
 current_line = 0
 
 # helper functions
-def isnumber(string):
+def isNumber(num: str) -> bool:
     """Test if given string is a number
 
     Args:
-        string (string): input string
+        num (str): input number
 
     Returns:
-        boolean: if given string is number
+        bool: if given string is number
     """
     try:
-        float(string)
+        float(num)
         return True
     except ValueError:
         return False
 
 
-def is_float(number):
+def isFloat(num: str) -> bool:
     """Test if given number is a float
 
     Args:
-        number : number to test
+        num : number to test
 
     Returns:
         boolean: if number is a float
     """
     try:
-        if float(number) == int(number):
+        if float(num) == int(num):
             return False
         else:
             return True
@@ -69,65 +69,57 @@ def is_float(number):
         return False
 
 
-def get_nonum(inp, lineNum):
+def getNoNum(value: str, lineNum: int) -> str:
     """Test if given input is not a number
 
     Args:
-        inp : input string
+        value (str) : input string
         lineNum (int): current line
 
     Returns:
         string: input as not a number
     """
-    global current_line
-    if isnumber(inp):
-        print(f"Error in line {lineNum + 1}: String expected, but got number: {inp}")
-    return inp
+    if isNumber(value):
+        print(f"Error in line {lineNum + 1}: String expected, but got number: {value}")
+    return value
 
 
-def get_value(inp):
+def getValue(value: str) -> float | int | str | bool:
     """Gets current value of any variable
 
     Args:
-        inp (string): variable name
+        value (str): variable name
 
     Returns:
-        any: value of given variable
+        (float | int | str | bool): value of given variable
     """
     global vars, bools
-    inp = str(inp).strip()
+    value = str(value).strip()
 
-    if isnumber(inp):
-        if is_float(inp):
-            return float(inp)
-        else:
-            return int(inp)
-    else:
-        if inp in vars:
-            return vars[inp]
-        elif inp in bools:
-            if bools[inp]:
-                return 1
-            elif bools[inp] == 0:
-                return 0
-        else:
-            try:
-                return solvemath(inp)
-            except:
-                return inp
+    if isNumber(value):
+        return getAsNumtype(value)
+    elif value in vars:
+        return vars[value]
+    elif value in bools:
+        return bools[value]
+
+    try:
+        return solveEquasion(value)
+    except:
+        return value
 
 
-def getline(line):
+def getLinePieces(line: str) -> list[str]:
     """returns a list of all pieces in the line
 
     Args:
         line (string): the full line to be split
 
     Returns:
-        string list: list of all pieces in a line
+        (list[str]): list of all pieces in a line
     """
     line.strip()
-    if line == "" or line.startswith("'"):
+    if line == "" or line.startswith("#"):
         return ""
     line = line.split("#")[0]
     linepieces = line.split(":")
@@ -136,42 +128,42 @@ def getline(line):
     return linepieces
 
 
-def search_array(string, array):
+def findInString(value: str, arr: list[str]) -> int | str:
     """tests if an element in an array is in the string
 
     Args:
-        string (string): string which should include something
-        array (string array): list of values which the string could include
+        value (str): string which should include something
+        arr (list[str]): list of values which the string could include
 
     Returns:
-        string or int: value which is included in the string or -1
+        (str | int): value which is included in the string or -1
     """
-    for k in range(len(array)):
-        if array[k] in string:
-            return array[k]
+    for k in range(len(arr)):
+        if arr[k] in value:
+            return arr[k]
     return -1
 
 
-def convertToBool(val):
+def convertToBool(value: str) -> str | bool:
     """Converts booleans as string to real booleans
 
     Args:
-        val (string): Value to convert to boolean
+        value (str): Value to convert to boolean
 
     Returns:
-        string or bool: the boolean which was given or if it isnt a boolean it just returns the value
+        (str | bool): the boolean which was given or if it isnt a boolean it just returns the value
     """
-    if val == "True" or val == "False":
-        return {"True": 1, "False": 0}[val]
+    if value == "True" or value == "False":
+        return {"True": 1, "False": 0}[value]
     else:
-        return val
+        return value
 
 
-def solvemath(equasion):
+def solveEquasion(equasion: str) -> float:
     """Solves the given equasion
 
     Args:
-        equasion (string): the mathematical equasion to be solved
+        equasion (str): the mathematical equasion to be solved
 
     Returns:
         float: solved equasion
@@ -190,9 +182,9 @@ def solvemath(equasion):
 
                 break
         tmpequasion = equasion[:start]
-        tmpequasion += str(int(solvemath(equasion[start + 1 : stop])))
+        tmpequasion += str(int(solveEquasion(equasion[start + 1 : stop])))
         tmpequasion += equasion[stop + 1 :]
-        return solvemath(tmpequasion)
+        return solveEquasion(tmpequasion)
     equasion = str(equasion)
     for i in vars:
         equasion = equasion.replace(i, str(vars[i]))
@@ -201,9 +193,9 @@ def solvemath(equasion):
 
     x = 0
     while x < len(equasion):
-        if isnumber(equasion[x]):
+        if isNumber(equasion[x]):
             if x > 0 and (
-                isnumber(equasion[x - 1])
+                isNumber(equasion[x - 1])
                 or values[len(values) - 1][len(values[len(values) - 1]) - 1]
                 in ["-", "."]
             ):
@@ -212,13 +204,13 @@ def solvemath(equasion):
                 values.append(str(equasion[x]))
         elif equasion[x] in [o for o in operators]:
             if (x == 0 and equasion[x] == "-") or (
-                x > 0 and not isnumber(equasion[x - 1])
+                x > 0 and not isNumber(equasion[x - 1])
             ):
                 values.append(equasion[x])
             else:
                 ops.append(str(equasion[x]))
         elif equasion[x] == ".":
-            if x > 0 and isnumber(equasion[x - 1]):
+            if x > 0 and isNumber(equasion[x - 1]):
                 values[len(values) - 1] += "."
             else:
                 values.append("0.")
@@ -248,7 +240,7 @@ def solvemath(equasion):
         for i in range(len(ops)):
             equasion += str(values[i]) + str((ops[i]))
         equasion += str(values[-1])
-        return getAsNumtype((solvemath(equasion)))
+        return getAsNumtype((solveEquasion(equasion)))
 
     elif len(ops) == 1:
         return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
@@ -256,33 +248,33 @@ def solvemath(equasion):
         return getAsNumtype(values[0])
 
 
-def findNextBracket(string, start):
+def findNextBracket(value: str, start: int) -> int:
     """finds the next bracket in a string
 
     Args:
-        string (string): string which should include something
+        value (str): string which should include something
         start (int): index of the bracket whose closing bracket is searched for
 
     Returns:
         int: index of the next bracket in the string
     """
     count = 1
-    for i in range(start + 1, len(string)):
-        if string[i] == "(":
+    for i in range(start + 1, len(value)):
+        if value[i] == "(":
             count += 1
-        elif string[i] == ")":
+        elif value[i] == ")":
             count -= 1
         if count == 0:
             return i
 
-    for i in range(start, len(string)):
+    for i in range(start, len(value)):
 
-        if string[i] == "(":
+        if value[i] == "(":
             return i
     return -1
 
 
-def varSet(pieces):
+def setVar(pieces: list[str]) -> bool:
     """Sets the value of a variable without the var keyword
 
     Args:
@@ -294,13 +286,13 @@ def varSet(pieces):
     global vars
     pieces = pieces.split("=")
     if pieces[0].strip() in vars:
-        vars[pieces[0].strip()] = get_value(pieces[1].strip())
+        vars[pieces[0].strip()] = getValue(pieces[1].strip())
         return 1
     else:
         return 0
 
 
-def boolSolv(pieces):
+def boolSolve(pieces: list[str]) -> bool:
     """checks bools and resolves them
 
     Args:
@@ -329,12 +321,12 @@ def boolSolv(pieces):
         for k in range(cons):
             mop = pieces[k * 2 + 0].replace("{", "").replace("}", "")
 
-            comp = search_array(mop, [c for c in comparators])
+            comp = findInString(mop, [c for c in comparators])
             if comp == -1:
                 if mop in vars:
                     mop = vars[mop]
                 if mop in bools:
-                    results.append(get_value(mop))
+                    results.append(getValue(mop))
                 elif mop.lower() == "true" or mop == "1":
                     results.append(1)
                 elif mop.lower() == "false" or mop == "0":
@@ -345,8 +337,8 @@ def boolSolv(pieces):
                     )
                     exit()
             else:
-                var1 = get_value(mop.split(comp)[0])
-                var2 = get_value(mop.split(comp)[1])
+                var1 = getValue(mop.split(comp)[0])
+                var2 = getValue(mop.split(comp)[1])
 
                 var1 = convertToBool(var1)
                 var2 = convertToBool(var2)
@@ -375,7 +367,7 @@ def boolSolv(pieces):
         exit()
 
 
-def getAsNumtype(num):
+def getAsNumtype(num: str) -> float | int:
     """converts a string to a number and checks if its a float or an int
 
     Args:
@@ -388,7 +380,7 @@ def getAsNumtype(num):
         float or int: convertet number
     """
     try:
-        if is_float(num):
+        if isFloat(num):
             return float(num)
         else:
             return int(num)
@@ -396,7 +388,7 @@ def getAsNumtype(num):
         raise Exception("Invalid data type")
 
 
-def getPath(path):
+def getPath(path: str) -> str:
     """resolves the given path
 
     Args:
@@ -430,25 +422,7 @@ def getPath(path):
         exit()
 
 
-def resource_path(relative_path):
-    """Get absolute path to resource, works for dev and for PyInstaller
-
-    Args:
-        relative_path (string): relative path to the resource
-
-    Returns:
-        string: path to the resource
-    """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path, relative_path)
-
-
-def searchInLib(pieces):
+def searchInLib(pieces: list[str]) -> bool:
     """search all libraries for given keyword
 
     Args:
@@ -483,7 +457,7 @@ def searchInLib(pieces):
 # keyword functions
 
 
-def kwVar(pieces):
+def kwVar(pieces: list[str]) -> None:
     """Adds a variable to the list of variables
 
     Args:
@@ -491,52 +465,52 @@ def kwVar(pieces):
     """
     global vars, current_line
 
-    vars[get_nonum(pieces[1], current_line).split("=")[0].strip()] = get_value(
+    vars[getNoNum(pieces[1], current_line).split("=")[0].strip()] = getValue(
         "".join((pieces[1]).split("=")[1:])
     )
 
 
-def kwArr(pieces):
+def kwArr(pieces: list[str]) -> None:
     """Adds an array to the list of arrays
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[get_nonum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
+    arrs[getNoNum(pieces[1], current_line)] = [0 for i in range(int(pieces[2]))]
 
 
-def kwApp(pieces):
+def kwApp(pieces: list[str]) -> None:
     """Appends to an array
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[get_nonum(pieces[1], current_line)].append(float(get_value(pieces[2])))
+    arrs[getNoNum(pieces[1], current_line)].append(float(getValue(pieces[2])))
 
 
-def kwGetArr(pieces):
+def kwGetArr(pieces: list[str]) -> None:
     """Gets the value of an item in an array at a specific index
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global vars, arrs
-    vars[str(pieces[3])] = arrs[str(pieces[1])][get_value(pieces[2])]
+    vars[str(pieces[3])] = arrs[str(pieces[1])][getValue(pieces[2])]
 
 
-def kwSetArr(pieces):
+def kwSetArr(pieces: list[str]) -> None:
     """Sets the value of a specific item in an array
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[str(pieces[1])][get_value(pieces[2])] = get_value(pieces[3])
+    arrs[str(pieces[1])][getValue(pieces[2])] = getValue(pieces[3])
 
 
-def kwOut(pieces):
+def kwOut(pieces: list[str]) -> None:
     """Prints the given input
 
     Args:
@@ -546,14 +520,14 @@ def kwOut(pieces):
     if pieces[1] in bools:
         out = ["False", "True"][int(bools[pieces[1]])]
     else:
-        out = get_value(pieces[1])
+        out = getValue(pieces[1])
     if not silent:
         print(out)
     if logging:
         log.write(str(out) + "\n")
 
 
-def kwGoTo(pieces):
+def kwGoTo(pieces: list[str]) -> None:
     """Sets the current line of the interpreter
 
     Args:
@@ -570,7 +544,7 @@ def kwGoTo(pieces):
         exit()
 
 
-def kwSleep(pieces):
+def kwSleep(pieces: list[str]) -> None:
     """Sleeps the given time
 
     Args:
@@ -579,14 +553,14 @@ def kwSleep(pieces):
     time.sleep(float(pieces[1]))
 
 
-def kwGoIf(pieces):
+def kwGoIf(pieces: list[str]) -> None:
     """Sets the current line of the interpreter if given condition is true
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global current_line, labels
-    res = boolSolv(pieces[2:])
+    res = boolSolve(pieces[2:])
 
     if res == 1:
         if pieces[1] in labels:
@@ -599,14 +573,14 @@ def kwGoIf(pieces):
             exit()
 
 
-def kwIf(pieces):
+def kwIf(pieces: list[str]) -> None:
     """Executes codeblock in curly brackets if condition is true
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global current_line
-    res = boolSolv(pieces[1:])
+    res = boolSolve(pieces[1:])
 
     if not res:
         brackets = 1
@@ -621,27 +595,27 @@ def kwIf(pieces):
                 exit()
 
 
-def kwBool(pieces):
+def kwBool(pieces: list[str]) -> None:
     """Creates a boolean
 
     Args:
         pieces (list[str]): list of all pieces in the line
     """
     global bools
-    name = get_nonum(pieces[1], current_line).split("=")[0].strip()
-    value = get_value(pieces[1].split("=")[1])
+    name = getNoNum(pieces[1], current_line).split("=")[0].strip()
+    value = getValue(pieces[1].split("=")[1])
 
     if value == "True":
         value = 1
     elif value == "False":
         value = 0
     else:
-        value = boolSolv(get_nonum(pieces[1], current_line).split("=")[1:])
+        value = boolSolve(getNoNum(pieces[1], current_line).split("=")[1:])
 
     bools[name] = value
 
 
-def kwImport(pieces):
+def kwImport(pieces: list[str]) -> None:
     """Imports a library
 
     Args:
@@ -670,7 +644,7 @@ def kwImport(pieces):
         exit()
 
 
-def kwEnd(pieces):
+def kwEnd(pieces: list[str]) -> None:
     """Ends the programm
 
     Args:
@@ -679,7 +653,7 @@ def kwEnd(pieces):
     exit()
 
 
-def NONE(pieces):
+def NONE(pieces: list[str]) -> None:
     """Placeholder for keywords that do nothing
 
     Args:
@@ -721,14 +695,14 @@ if len(overwrite) == 0:
         # launch console mode
         print("--- Using stoopid in console mode ---")
         while True:
-            linepieces = getline(str(input(">> ")))
+            linepieces = getLinePieces(str(input(">> ")))
             if not linepieces:
                 print("Error: No keyword given")
                 continue
             elif linepieces[0] in keywords:
                 keywords[linepieces[0].lower()](linepieces)
                 linepieces = ""
-            elif not searchInLib(linepieces) and not varSet(linepieces[0]):
+            elif not searchInLib(linepieces) and not setVar(linepieces[0]):
                 print("Error: Unknown keyword")
                 continue
 else:
@@ -751,17 +725,17 @@ if "--log" in sys.argv:
     log = open(log_file, "w")
 
 ## disables output completely
-silent = "--silent" in sys.argv
+silent: bool = "--silent" in sys.argv
 
 # main loops
 
 ## resolve all lables
 for i in range(len(program_lines)):
     try:
-        linepieces = getline(program_lines[i])
+        linepieces = getLinePieces(program_lines[i])
 
         if linepieces[-1] == "label":  # :name:label at the end of the line
-            labels[get_nonum(linepieces[-2], i)] = i
+            labels[getNoNum(linepieces[-2], i)] = i
     except Exception as e:
         print(f"Error in line {i + 1} while resolving labels:\n{str(e)}")
         exit()
@@ -769,7 +743,7 @@ for i in range(len(program_lines)):
 ## runs the code
 while current_line < len(program_lines):
     # get the line
-    linepieces = getline(program_lines[current_line])
+    linepieces = getLinePieces(program_lines[current_line])
 
     if linepieces[0] == "":
         current_line += 1
@@ -783,7 +757,7 @@ while current_line < len(program_lines):
             print(f"Error in line {current_line + 1}:\n{str(e)}")
             print("interpreter crashed at line: ", e.__traceback__.tb_lineno)
             exit()
-    elif not searchInLib(linepieces) and not varSet(linepieces[0]):
+    elif not searchInLib(linepieces) and not setVar(linepieces[0]):
         print(f"Error in line {current_line + 1}: Unknown keyword: {linepieces[0]}")
         exit()
     current_line += 1
