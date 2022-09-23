@@ -25,10 +25,13 @@
 | bool | `bool : <name> = <value>` | Creates a boolean |
 | import | `import : <library name>` | Imports an external library from `%appdata%/stoopid/libs` |
 | end | `end` | Stops code |
+| external | `<libraryName>.<keywordName> : <args>` | uses a keyword from an external library |
 ##
 ##### Other useful features
 Comments can be made with a # as the first character: `# this is a comment`
 Labels can be added after a line and you can jump to them with `goto` or `goif`: `: <label>`
+After initialisation variables can be used like this: `<name> = <value>`
+If no filename was given, Console Mode will be started and you can input any valid one line stoopid code in the console
 ##
 ##### Comparators
 | Comparator | Example |
