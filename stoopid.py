@@ -50,6 +50,21 @@ def isNumber(num: str) -> bool:
     except ValueError:
         return False
 
+def getType(value):
+    global vars,bools,arrs,labels
+    if value in vars:
+        return "var"
+    elif value in bools:
+        return "bool"
+    elif value in arrs:
+        return "arr"
+    elif value in labels:
+        return "label"
+    elif isNumber(value):
+        if isFloat(value):
+            return "float"
+        return "int"
+    return "str"
 
 def isFloat(num: str) -> bool:
     """Test if given number is a float
@@ -174,13 +189,23 @@ def solveEquasion(equasion: str) -> float:
         for k in range(len(equasion)):
             if equasion[k] == "(":
                 start = k
+        end=1
+        for j in range(start+1, len(equasion)):
 
-                break
-        for k in range(len(equasion) - 1, 0, -1):
-            if equasion[k] == ")":
-                stop = k
 
+            if equasion[j] == "(":
+                end +=1
+            if equasion[j] == ")":
+                end -=1
+            #print(j,end,equasion[j])
+            if end==0 :
+                stop=j
                 break
+        else:
+            print("No matching bracket")
+
+        #print("math",equasion[start:stop], start, stop, equasion,"endmath")
+        #exit()
         tmpequasion = equasion[:start]
         tmpequasion += str(int(solveEquasion(equasion[start + 1 : stop])))
         tmpequasion += equasion[stop + 1 :]
