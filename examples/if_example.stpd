@@ -1,3 +1,4 @@
+#expected: 2, 2,it-works,3
 # for testing if statements
 var : a = 1
 var : b = 2
@@ -10,7 +11,7 @@ if : a << b : {
     if : a == b : {
         out : a
     }
-    
+
     out : b
 }
 
@@ -23,4 +24,4 @@ if : test2 : {
 }
 
 var : c = a + b
-out : c     
+out : c

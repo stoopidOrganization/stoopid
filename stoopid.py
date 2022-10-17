@@ -168,7 +168,7 @@ def convertToBool(value: str) -> str | bool:
     Returns:
         (str | bool): the boolean which was given or if it isnt a boolean it just returns the value
     """
-    if value == "True" or value == "False":
+    if value in ("True", "False"):
         return {"True": 1, "False": 0}[value]
     else:
         return value
@@ -186,6 +186,7 @@ def solveEquasion(equasion: str) -> float:
     global operators, vars, orderOfOps, current_line
     equasion = equasion.replace(" ", "")
     if "(" in equasion:
+        start,end,stop=0,0,0
         for k in range(len(equasion)):
             if equasion[k] == "(":
                 start = k
@@ -262,7 +263,7 @@ def solveEquasion(equasion: str) -> float:
         for i in range(len(ops)):
             equasion += str(values[i]) + str((ops[i]))
         equasion += str(values[-1])
-        return getAsNumtype((solveEquasion(equasion)))
+        return getAsNumtype(str((solveEquasion(equasion))))
 
     elif len(ops) == 1:
         return getAsNumtype(operators[ops[0]](float(values[0]), float(values[1])))
@@ -296,22 +297,22 @@ def findNextBracket(value: str, start: int) -> int:
     return -1
 
 
-def setVar(pieces: list[str]) -> bool:
+def setVar(pieces: str) -> bool:
     """Sets the value of a variable without the var keyword
 
     Args:
-        pieces (list[str]): list of all pieces in the line
+        pieces (str): list of all pieces in the line
 
     Returns:
         bool: if variable was found
     """
     global vars
-    pieces = pieces.split("=")
-    if pieces[0].strip() in vars:
-        vars[pieces[0].strip()] = getValue(pieces[1].strip())
-        return 1
+    piecestmp = pieces.split("=")
+    if piecestmp[0].strip() in vars:
+        vars[piecestmp[0].strip()] = getValue(piecestmp[1].strip())
+        return True
     else:
-        return 0
+        return False
 
 
 def boolSolve(pieces: list[str]) -> bool:

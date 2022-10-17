@@ -14,7 +14,8 @@ def test_file(file):
         expected=header.split(":")[1].split(",")
     print("The expected output is:")
     for i in expected:
-        print(i)
+        print("  "+i.strip())
+    print()
     os.system(f"python stoopid.py {file} --log output.txt --silent")
     with open("output.txt","r") as f:
         output=f.readlines()
@@ -26,7 +27,7 @@ def test_file(file):
     failed="Passed"
     for i in range(len(expected)):
         try:
-            print(o[i],end="")
+            print("  "+o[i],end="")
             if o[i].strip()!=expected[i].strip():
                 print(f"\t<-- Missmatch! Expected {expected[i]}",end="")
                 failed="Failed"
