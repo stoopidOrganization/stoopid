@@ -197,15 +197,12 @@ def solveEquasion(equasion: str) -> float:
                 end +=1
             if equasion[j] == ")":
                 end -=1
-            #print(j,end,equasion[j])
             if end==0 :
                 stop=j
                 break
         else:
             print("No matching bracket")
 
-        #print("math",equasion[start:stop], start, stop, equasion,"endmath")
-        #exit()
         tmpequasion = equasion[:start]
         tmpequasion += str(int(solveEquasion(equasion[start + 1 : stop])))
         tmpequasion += equasion[stop + 1 :]
