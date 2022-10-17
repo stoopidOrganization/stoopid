@@ -23,4 +23,4 @@ if : test2 : {
 }
 
 var : c = a + b
-out : c
+out : c     

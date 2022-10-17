@@ -120,7 +120,7 @@ def getLinePieces(line: str) -> list[str]:
     """
     line.strip()
     if line == "" or line.startswith("#"):
-        return ""
+        return [""]
     line = line.split("#")[0]
     linepieces = line.split(":")
     for k in range(len(linepieces)):
@@ -733,11 +733,11 @@ silent: bool = "--silent" in sys.argv
 for i in range(len(program_lines)):
     try:
         linepieces = getLinePieces(program_lines[i])
-
         if linepieces[-1] == "label":  # :name:label at the end of the line
             labels[getNoNum(linepieces[-2], i)] = i
     except Exception as e:
         print(f"Error in line {i + 1} while resolving labels:\n{str(e)}")
+        print("Interpreter crashed at line: ", e.__traceback__.tb_lineno)
         exit()
 
 ## runs the code
