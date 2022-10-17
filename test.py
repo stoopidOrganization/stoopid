@@ -23,13 +23,14 @@ def test_file(file):
     for i in output:
         if i.strip().replace("\n","")!="":
             o.append(i.strip().replace("\n",""))
-            print(i.strip().replace("\n",""))
     failed="Passed"
     for i in range(len(expected)):
         try:
+            print(o[i],end="")
             if o[i].strip()!=expected[i].strip():
-                print(f"{file} failed in line {i+1}")
+                print(f"\t<-- Missmatch! Expected {expected[i]}",end="")
                 failed="Failed"
+            print()
         except Exception:
             print(f"{file} failed in line {i+1} (something happened, idk)")
             failed="Failed"
