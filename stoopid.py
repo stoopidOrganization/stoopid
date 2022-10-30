@@ -76,7 +76,7 @@ def isFloat(num: str) -> bool:
         boolean: if number is a float
     """
     try:
-        if float(num) == int(num):
+        if float(num) == int(float(num)):
             return False
         else:
             return True
@@ -403,12 +403,13 @@ def getAsNumtype(num: str) -> float | int:
         float or int: convertet number
     """
     try:
+        num=num.strip()
         if isFloat(num):
             return float(num)
         else:
             return int(num)
     except:
-        raise Exception("Invalid data type")
+        raise Exception(f"Invalid data type, {num} is not a number")
 
 
 def getPath(path: str) -> str:
