@@ -710,6 +710,23 @@ keywords = {
 
 # get the system arguments
 
+if "--v" in sys.argv or "--version" in sys.argv:
+    for i in range(50):
+        print("\n")
+    print("  /$$$$$$   /$$                                   /$$       /$$")
+    print(" /$$__  $$ | $$                                  |__/      | $$")
+    print("| $$  \__//$$$$$$    /$$$$$$   /$$$$$$   /$$$$$$  /$$  /$$$$$$$")
+    print("|  $$$$$$|_  $$_/   /$$__  $$ /$$__  $$ /$$__  $$| $$ /$$__  $$")
+    print(" \____  $$ | $$    | $$  \ $$| $$  \ $$| $$  \ $$| $$| $$  | $$")
+    print(" /$$  \ $$ | $$ /$$| $$  | $$| $$  | $$| $$  | $$| $$| $$  | $$")
+    print("|  $$$$$$/ |  $$$$/|  $$$$$$/|  $$$$$$/| $$$$$$$/| $$|  $$$$$$$")
+    print(" \______/   \___/   \______/  \______/ | $$____/ |__/ \_______/")
+    print("                                       | $$                    ")
+    print("                                       | $$                    ")
+    print("                                       |__/                    ")
+    print("\t\tVersion 0.1")
+    exit()
+
 ## get the filename, always the first argument
 overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
 if len(overwrite) == 0:
