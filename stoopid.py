@@ -1,4 +1,4 @@
-import time, sys, os, subprocess
+import time, sys, os, subprocess, json
 from sys import exit
 
 # initialize some default variables
@@ -710,7 +710,7 @@ keywords = {
 
 # get the system arguments
 
-if "--v" in sys.argv or "--version" in sys.argv:
+if "-v" in sys.argv or "--version" in sys.argv:
     for i in range(50):
         print("\n")
     print("  /$$$$$$   /$$                                   /$$       /$$")
@@ -724,7 +724,15 @@ if "--v" in sys.argv or "--version" in sys.argv:
     print("                                       | $$                    ")
     print("                                       | $$                    ")
     print("                                       |__/                    ")
-    print("\t\tVersion 0.1")
+   
+    print()
+    
+    with open("info.json", "r") as f:
+        data = json.load(f)
+        print(f"\t\tVersion: {data['versionName']}")
+        print(f"\t\tNumeric Version: {data['versionNumber']}")
+        print(f"\t\tStoopid Version: {data['stoopidStandart']}")
+        
     exit()
 
 ## get the filename, always the first argument
