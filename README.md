@@ -3,6 +3,9 @@
 ##### Usage:
 - Python: `python stoopid.py <filename>`
 - Executable: `stoopid.exe <filename>`
+
+Use `-v` or `--version` flag to display some information about your current installation of stoopid
+
 ##
 ##### Aditional Parameters
 | Parameter | Description |
