@@ -1,4 +1,4 @@
-import time, sys, os, subprocess
+import time, sys, os, subprocess, json
 from sys import exit
 
 # initialize some default variables
@@ -709,6 +709,31 @@ keywords = {
 }
 
 # get the system arguments
+
+if "-v" in sys.argv or "--version" in sys.argv:
+    for i in range(50):
+        print("\n")
+    print("  /$$$$$$   /$$                                   /$$       /$$")
+    print(" /$$__  $$ | $$                                  |__/      | $$")
+    print("| $$  \__//$$$$$$    /$$$$$$   /$$$$$$   /$$$$$$  /$$  /$$$$$$$")
+    print("|  $$$$$$|_  $$_/   /$$__  $$ /$$__  $$ /$$__  $$| $$ /$$__  $$")
+    print(" \____  $$ | $$    | $$  \ $$| $$  \ $$| $$  \ $$| $$| $$  | $$")
+    print(" /$$  \ $$ | $$ /$$| $$  | $$| $$  | $$| $$  | $$| $$| $$  | $$")
+    print("|  $$$$$$/ |  $$$$/|  $$$$$$/|  $$$$$$/| $$$$$$$/| $$|  $$$$$$$")
+    print(" \______/   \___/   \______/  \______/ | $$____/ |__/ \_______/")
+    print("                                       | $$                    ")
+    print("                                       | $$                    ")
+    print("                                       |__/                    ")
+   
+    print()
+    
+    with open("info.json", "r") as f:
+        data = json.load(f)
+        print(f"\t\tVersion: {data['versionName']}")
+        print(f"\t\tNumeric Version: {data['versionNumber']}")
+        print(f"\t\tStoopid Version: {data['stoopidStandart']}")
+        
+    exit()
 
 ## get the filename, always the first argument
 overwrite = ""  # this is used for debugging purposes only, and should be empty in production. It will force the interpreter to load a specific file, instead of the arguments.
