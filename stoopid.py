@@ -521,7 +521,7 @@ def kwGetArr(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global vars, arrs
-    vars[str(pieces[3])] = arrs[str(pieces[1])][getValue(pieces[2])]
+    vars[str(pieces[3])] = arrs[str(pieces[1])][getValue(pieces[2])+0.5]
 
 
 def kwSetArr(pieces: list[str]) -> None:
@@ -531,7 +531,7 @@ def kwSetArr(pieces: list[str]) -> None:
         pieces (list[str]): list of all pieces in the line
     """
     global arrs
-    arrs[str(pieces[1])][getValue(pieces[2])] = getValue(pieces[3])
+    arrs[str(pieces[1])][getValue(pieces[2])+0.5] = getValue(pieces[3])
 
 
 def kwOut(pieces: list[str]) -> None:
